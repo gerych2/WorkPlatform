@@ -1,5 +1,5 @@
 {
-  "name": "service-booking-platform",
+  "name": "prodo-agency",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,13 +14,16 @@
     "@prisma/client": "^6.14.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.10.5",
+    "@types/nodemailer": "^7.0.1",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
     "autoprefixer": "^10.4.16",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.0.0",
+    "dotenv": "^17.2.2",
     "lucide-react": "^0.294.0",
     "next": "14.0.4",
+    "nodemailer": "^7.0.6",
     "postcss": "^8.4.32",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

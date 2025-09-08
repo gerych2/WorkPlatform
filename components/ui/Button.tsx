@@ -22,9 +22,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     const variants = {
       primary: 'bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500',
-      secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800 focus:ring-gray-500',
-      outline: 'border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 focus:ring-primary-500',
-      ghost: 'hover:bg-gray-100 text-gray-700 focus:ring-gray-500'
+      secondary: 'bg-secondary-200 hover:bg-secondary-300 text-gray-800 focus:ring-secondary-500',
+      outline: 'border border-primary-300 bg-white hover:bg-primary-50 text-primary-700 focus:ring-primary-500',
+      ghost: 'hover:bg-secondary-100 text-gray-700 focus:ring-secondary-500'
     }
     
     const sizes = {

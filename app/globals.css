@@ -10,7 +10,7 @@
   }
   
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-secondary-50 text-gray-900;
   }
 }
 
@@ -20,14 +20,135 @@
   }
   
   .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-secondary-200 hover:bg-secondary-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+  .btn-outline {
+    @apply border border-primary-300 bg-white hover:bg-primary-50 text-primary-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    @apply bg-white rounded-lg shadow-sm border border-secondary-200 p-6;
   }
   
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
   }
+  
+  /* Полностью скрываем иконку замка в полях пароля */
+  input[type="password"],
+  .input-field[type="password"] {
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    background-position: right center !important;
+    -webkit-text-security: disc;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  
+  /* Скрываем все возможные иконки браузера */
+  input[type="password"]::-webkit-credentials-auto-fill-button,
+  input[type="password"]::-webkit-strong-password-auto-fill-button,
+  input[type="password"]::-webkit-credentials-auto-fill-icon,
+  .input-field[type="password"]::-webkit-credentials-auto-fill-button,
+  .input-field[type="password"]::-webkit-strong-password-auto-fill-button,
+  .input-field[type="password"]::-webkit-credentials-auto-fill-icon {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+  }
+  
+  /* Убираем все возможные псевдоэлементы */
+  input[type="password"]::-webkit-outer-spin-button,
+  input[type="password"]::-webkit-inner-spin-button,
+  input[type="password"]::-webkit-search-cancel-button,
+  input[type="password"]::-webkit-search-decoration,
+  input[type="password"]::-webkit-search-results-button,
+  input[type="password"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    display: none !important;
+  }
+  
+  /* Скрываем иконки для всех атрибутов autocomplete */
+  input[type="password"][autocomplete],
+  input[type="password"][autocomplete="current-password"],
+  input[type="password"][autocomplete="new-password"],
+  input[type="password"][autocomplete="off"] {
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+  }
+  
+  /* Дополнительная защита от иконок */
+  input[type="password"]:focus,
+  input[type="password"]:hover,
+  input[type="password"]:active {
+    background-image: none !important;
+  }
+  
+  .header-bg {
+    @apply bg-primary-600 text-white;
+  }
+  
+  .sidebar-bg {
+    @apply bg-primary-700 text-white;
+  }
+  
+  .accent-bg {
+    @apply bg-secondary-600 text-gray-900;
+  }
+  
+  .accent-border {
+    @apply border-secondary-400;
+  }
+}
+
+/* Дополнительные стили для полного скрытия иконки замка */
+@layer utilities {
+  .no-password-icon {
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+  
+  .no-password-icon::-webkit-credentials-auto-fill-button,
+  .no-password-icon::-webkit-strong-password-auto-fill-button,
+  .no-password-icon::-webkit-credentials-auto-fill-icon {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+
+/* Глобальное скрытие иконки замка для всех полей пароля */
+input[type="password"] {
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-strong-password-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-icon {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
 } 

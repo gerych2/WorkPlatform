@@ -14,84 +14,57 @@ export default function AdminLogin() {
   const [error, setError] = useState('')
   const router = useRouter()
 
-  // Список разрешенных администраторов (в реальном проекте это будет в БД)
-  const allowedAdmins = [
-    { email: 'admin@serviceplatform.by', password: 'admin123', name: 'Главный администратор' },
-    { email: 'manager@serviceplatform.by', password: 'manager123', name: 'Менеджер платформы' }
-  ]
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError('')
 
-    // Имитация задержки
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    try {
+      const response = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
 
-    // Проверка учетных данных
-    const admin = allowedAdmins.find(
-      a => a.email === email && a.password === password
-    )
+      const data = await response.json()
 
-    if (admin) {
-      // В реальном проекте здесь будет JWT токен
-      localStorage.setItem('adminAuth', JSON.stringify({
-        email: admin.email,
-        name: admin.name,
-        role: 'admin',
-        timestamp: Date.now()
-      }))
-      
-      router.push('/admin')
-    } else {
-      setError('Неверный email или пароль')
+      if (response.ok) {
+        localStorage.setItem('adminAuth', JSON.stringify({
+          email: data.admin.email,
+          name: data.admin.name,
+          role: 'admin',
+          timestamp: Date.now()
+        }))
+        
+        router.push('/admin')
+      } else {
+        setError(data.error || 'Ошибка входа')
+      }
+    } catch (error) {
+      setError('Ошибка соединения с сервером')
     }
 
     setIsLoading(false)
   }
 
-  const checkAuth = () => {
-    const auth = localStorage.getItem('adminAuth')
-    if (auth) {
-      const authData = JSON.parse(auth)
-      // Проверяем, не истек ли токен (24 часа)
-      if (Date.now() - authData.timestamp < 24 * 60 * 60 * 1000) {
-        router.push('/admin')
-        return
-      } else {
-        localStorage.removeItem('adminAuth')
-      }
-    }
-  }
-
-  // Проверяем аутентификацию при загрузке
-  React.useEffect(() => {
-    checkAuth()
-  }, [])
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        {/* Логотип и заголовок */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Shield className="h-10 w-10 text-red-600" />
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="text-center mb-8">
+            <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+              <Shield className="h-8 w-8 text-blue-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Админ-панель</h1>
+            <p className="text-gray-600 mt-2">Войдите в систему управления</p>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Админ-панель
-          </h1>
-          <p className="text-gray-600">
-            Войдите в систему управления платформой
-          </p>
-        </div>
 
-        {/* Форма входа */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
           <form onSubmit={handleLogin} className="space-y-6">
-            {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email администратора
+                Email
               </label>
               <Input
                 id="email"
@@ -104,7 +77,6 @@ export default function AdminLogin() {
               />
             </div>
 
-            {/* Пароль */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Пароль
@@ -117,50 +89,43 @@ export default function AdminLogin() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Введите пароль"
                   required
-                  className="w-full pr-10"
+                  className="w-full pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
-            {/* Ошибка */}
             {error && (
-              <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
-                <span className="text-sm text-red-700">{error}</span>
+              <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-lg">
+                <AlertTriangle className="h-5 w-5" />
+                <span className="text-sm">{error}</span>
               </div>
             )}
 
-            {/* Кнопка входа */}
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-red-600 hover:bg-red-700"
+              className="w-full"
             >
-              {isLoading ? 'Вход...' : 'Войти в админ-панель'}
+              {isLoading ? 'Вход...' : 'Войти'}
             </Button>
           </form>
 
-
-        </div>
-
-        {/* Информация о безопасности */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
-            ⚠️ Доступ только для уполномоченных сотрудников платформы
-          </p>
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500">
+              Демо-доступ: admin@serviceplatform.by / admin123
+            </p>
+          </div>
         </div>
       </div>
     </div>
   )
-} 
+}
+
+

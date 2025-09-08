@@ -24,7 +24,8 @@ export default function Register() {
     experience: '',
     hourlyRate: '',
     categories: [] as string[],
-    documents: [] as File[]
+    documents: [] as File[],
+    referralCode: '' // Добавляем поле для реферального кода
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
@@ -88,6 +89,7 @@ export default function Register() {
       if (!formData.experience.trim()) newErrors.experience = 'Опыт работы обязателен'
       if (!formData.hourlyRate.trim()) newErrors.hourlyRate = 'Почасовая ставка обязательна'
       if (formData.categories.length === 0) newErrors.categories = 'Выберите хотя бы одну категорию'
+      if (formData.categories.length > 3) newErrors.categories = 'Можно выбрать максимум 3 категории'
       if (formData.documents.length === 0) newErrors.documents = 'Загрузите необходимые документы'
     }
 
@@ -113,12 +115,33 @@ export default function Register() {
   }
 
   const handleCategoryToggle = (categoryId: string) => {
-    setFormData(prev => ({
-      ...prev,
-      categories: prev.categories.includes(categoryId)
-        ? prev.categories.filter(id => id !== categoryId)
-        : [...prev.categories, categoryId]
-    }))
+    setFormData(prev => {
+      if (prev.categories.includes(categoryId)) {
+        // Убираем категорию
+        return {
+          ...prev,
+          categories: prev.categories.filter(id => id !== categoryId)
+        }
+      } else {
+        // Добавляем категорию, но не больше 3
+        if (prev.categories.length >= 3) {
+          setErrors(prevErrors => ({
+            ...prevErrors,
+            categories: 'Можно выбрать максимум 3 категории'
+          }))
+          return prev
+        }
+        return {
+          ...prev,
+          categories: [...prev.categories, categoryId]
+        }
+      }
+    })
+    
+    // Очищаем ошибку при изменении
+    if (errors.categories) {
+      setErrors(prev => ({ ...prev, categories: '' }))
+    }
   }
 
   const handleFileUpload = (files: File[]) => {
@@ -132,19 +155,23 @@ export default function Register() {
     setIsLoading(true)
 
     try {
-      // Создаем пользователя
-      const userData = {
+      // Подготавливаем данные для регистрации
+      const registrationData = {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
+        password: formData.password,
         role: formData.role,
         location: formData.location,
         legalStatus: formData.legalStatus as 'ИП' | 'Юр. лицо' | 'Самозанятый',
+        referralCode: formData.referralCode, // Добавляем реферальный код
         profile: formData.role === 'executor' ? {
           description: formData.description,
           experience: formData.experience,
-          hourlyRate: parseFloat(formData.hourlyRate),
-          categories: formData.categories
+          hourlyRate: formData.hourlyRate,
+          categories: formData.categories,
+          workingHours: {},
+          responseTime: '24 часа'
         } : undefined
       }
 
@@ -154,15 +181,7 @@ export default function Register() {
         headers: {
           'Content-Type': 'application/json',
         },
-                 body: JSON.stringify({
-           name: formData.name,
-           email: formData.email,
-           phone: formData.phone,
-           password: formData.password,
-           role: formData.role,
-           location: formData.location,
-           legalStatus: formData.legalStatus
-         })
+        body: JSON.stringify(registrationData)
       })
 
       if (!response.ok) {
@@ -177,57 +196,42 @@ export default function Register() {
         throw new Error('Ошибка создания пользователя')
       }
 
-             // Если это исполнитель, создаем профиль через API
-       if (formData.role === 'executor' && newUser) {
-         try {
-           const profileResponse = await fetch('/api/executor/profile', {
-             method: 'POST',
-             headers: {
-               'Content-Type': 'application/json',
-             },
-             body: JSON.stringify({
-               userId: newUser.id,
-               description: formData.description,
-               experience: formData.experience,
-               hourlyRate: formData.hourlyRate,
-               categories: formData.categories,
-               workingHours: {},
-               responseTime: '24 часа'
-             })
-           })
-
-           if (profileResponse.ok) {
-             console.log('Профиль исполнителя создан успешно')
-           } else {
-             console.error('Ошибка создания профиля исполнителя')
-           }
-         } catch (error) {
-           console.error('Ошибка создания профиля исполнителя:', error)
-           // Продолжаем регистрацию, даже если профиль не создался
-         }
-       }
-
-             // Очищаем старые данные и сохраняем нового пользователя
-       localStorage.removeItem('currentUser')
-       localStorage.removeItem('adminAuth')
-       localStorage.setItem('currentUser', JSON.stringify(newUser))
+      // Очищаем старые данные и сохраняем нового пользователя
+      localStorage.removeItem('currentUser')
+      localStorage.removeItem('adminAuth')
+      
+      // Добавляем время регистрации
+      const userWithRegistrationTime = {
+        ...newUser,
+        registrationTime: new Date().toISOString()
+      }
+      
+      localStorage.setItem('currentUser', JSON.stringify(userWithRegistrationTime))
 
       // Показываем уведомление об успехе
-      alert(formData.role === 'executor' 
-        ? 'Регистрация успешна! Ваши документы отправлены на проверку. После одобрения вы сможете получать заказы.'
-        : 'Регистрация успешна! Добро пожаловать на платформу!'
-      )
+      let successMessage = result.message || 'Регистрация успешна!'
+      
+      // Добавляем информацию о реферальном коде, если он был применен
+      if (result.referral && result.referral.success) {
+        successMessage += `\n\n🎉 Реферальный код применен! Вы получили бонусы: ${result.referral.rewards?.xp || 0} XP`
+      } else if (result.referral && !result.referral.success) {
+        successMessage += `\n\n⚠️ Реферальный код не найден или недействителен`
+      }
+      
+      alert(successMessage)
 
       // Перенаправляем в соответствующий кабинет
       if (formData.role === 'client') {
         router.push('/dashboard/client')
-      } else {
+      } else if (formData.role === 'executor') {
         router.push('/dashboard/executor')
+      } else {
+        router.push('/dashboard/admin')
       }
 
     } catch (error) {
       console.error('Ошибка регистрации:', error)
-      alert('Произошла ошибка при регистрации. Попробуйте еще раз.')
+      alert(error instanceof Error ? error.message : 'Произошла ошибка при регистрации. Попробуйте еще раз.')
     } finally {
       setIsLoading(false)
     }
@@ -243,15 +247,15 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-secondary-100 to-secondary-200 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Заголовок */}
         <div className="text-center mb-12">
-          <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+          <div className="w-24 h-24 bg-gradient-to-br from-primary-600 to-primary-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
             <UserPlus className="h-12 w-12 text-white" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Регистрация на платформе
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-4">
+            Регистрация в ProDoAgency
           </h1>
           <p className="text-xl text-gray-600">
             Присоединяйтесь к сообществу профессионалов и клиентов
@@ -259,22 +263,22 @@ export default function Register() {
         </div>
 
         {/* Форма регистрации */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-secondary-200">
           {/* Прогресс-бар */}
           <div className="mb-10">
             <div className="flex items-center justify-between mb-6">
-              <div className={`flex items-center space-x-3 ${step >= 1 ? 'text-blue-600' : 'text-gray-400'}`}>
+              <div className={`flex items-center space-x-3 ${step >= 1 ? 'text-primary-600' : 'text-gray-400'}`}>
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
-                  step >= 1 ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg' : 'bg-gray-100 text-gray-400'
+                  step >= 1 ? 'bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-lg' : 'bg-gray-100 text-gray-400'
                 }`}>
                   1
                 </div>
                 <span className="text-sm font-semibold">Основная информация</span>
               </div>
               
-              <div className={`flex items-center space-x-3 ${step >= 2 ? 'text-blue-600' : 'text-gray-400'}`}>
+              <div className={`flex items-center space-x-3 ${step >= 2 ? 'text-primary-600' : 'text-gray-400'}`}>
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
-                  step >= 2 ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg' : 'bg-gray-100 text-gray-400'
+                  step >= 2 ? 'bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-lg' : 'bg-gray-100 text-gray-400'
                 }`}>
                   2
                 </div>
@@ -286,7 +290,7 @@ export default function Register() {
             
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 shadow-sm"
+                className="bg-gradient-to-r from-primary-600 to-primary-700 h-3 rounded-full transition-all duration-500 shadow-sm"
                 style={{ width: `${(step / (formData.role === 'executor' ? 2 : 1)) * 100}%` }}
               />
             </div>
@@ -307,11 +311,11 @@ export default function Register() {
                       onClick={() => handleInputChange('role', 'client')}
                       className={`p-6 border-2 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${
                         formData.role === 'client'
-                          ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-700 shadow-lg'
-                          : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                          ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-secondary-50 text-primary-700 shadow-lg'
+                          : 'border-gray-200 hover:border-primary-300 hover:bg-primary-50'
                       }`}
                     >
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
+                      <div className="w-16 h-16 bg-gradient-to-br from-primary-600 to-primary-700 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
                         <User className="h-8 w-8 text-white" />
                       </div>
                       <div className="font-semibold text-lg mb-1">Клиент</div>
@@ -323,11 +327,11 @@ export default function Register() {
                       onClick={() => handleInputChange('role', 'executor')}
                       className={`p-6 border-2 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${
                         formData.role === 'executor'
-                          ? 'border-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 text-purple-700 shadow-lg'
-                          : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
+                          ? 'border-secondary-500 bg-gradient-to-br from-secondary-50 to-secondary-100 text-secondary-700 shadow-lg'
+                          : 'border-gray-200 hover:border-secondary-300 hover:bg-secondary-50'
                       }`}
                     >
-                      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
+                      <div className="w-16 h-16 bg-gradient-to-br from-secondary-600 to-secondary-700 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md">
                         <Shield className="h-8 w-8 text-white" />
                       </div>
                       <div className="font-semibold text-lg mb-1">Исполнитель</div>
@@ -349,7 +353,7 @@ export default function Register() {
                       onChange={(e) => handleInputChange('name', e.target.value)}
                                              placeholder="Ваше имя"
                       className={`px-4 py-3 border-2 rounded-xl transition-all duration-200 ${
-                        errors.name ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+                        errors.name ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'
                       }`}
                     />
                     {errors.name && (
@@ -371,7 +375,7 @@ export default function Register() {
                       onChange={(e) => handleInputChange('email', e.target.value)}
                                              placeholder="your@email.com"
                       className={`px-4 py-3 border-2 rounded-xl transition-all duration-200 ${
-                        errors.email ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+                        errors.email ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'
                       }`}
                     />
                     {errors.email && (
@@ -393,7 +397,7 @@ export default function Register() {
                       onChange={(e) => handleInputChange('phone', formatPhone(e.target.value))}
                       placeholder="+375 (29) 123-45-67"
                       className={`px-4 py-3 border-2 rounded-xl transition-all duration-200 ${
-                        errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+                        errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'
                       }`}
                     />
                     {errors.phone && (
@@ -415,7 +419,7 @@ export default function Register() {
                        onChange={(e) => handleInputChange('location', e.target.value)}
                        placeholder="Минск, Центральный район"
                        className={`px-4 py-3 border-2 rounded-xl transition-all duration-200 ${
-                         errors.location ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+                         errors.location ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'
                        }`}
                      />
                      {errors.location && (
@@ -436,8 +440,9 @@ export default function Register() {
                        value={formData.password}
                        onChange={(e) => handleInputChange('password', e.target.value)}
                        placeholder="Минимум 6 символов"
-                       className={`px-4 py-3 border-2 rounded-xl transition-all duration-200 ${
-                         errors.password ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+                       autoComplete="off"
+                       className={`px-4 py-3 border-2 rounded-xl transition-all duration-200 no-password-icon ${
+                         errors.password ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'
                        }`}
                      />
                      {errors.password && (
@@ -458,8 +463,9 @@ export default function Register() {
                        value={formData.confirmPassword}
                        onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                        placeholder="Повторите пароль"
-                       className={`px-4 py-3 border-2 rounded-xl transition-all duration-200 ${
-                         errors.confirmPassword ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+                       autoComplete="off"
+                       className={`px-4 py-3 border-2 rounded-xl transition-all duration-200 no-password-icon ${
+                         errors.confirmPassword ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'
                        }`}
                      />
                      {errors.confirmPassword && (
@@ -469,6 +475,33 @@ export default function Register() {
                        </p>
                      )}
                    </div>
+
+                   {/* Поле реферального кода */}
+                   <div>
+                     <label htmlFor="referralCode" className="block text-sm font-semibold text-gray-700 mb-3">
+                       Реферальный код друга <span className="text-gray-500 font-normal">(необязательно)</span>
+                     </label>
+                     <Input
+                       id="referralCode"
+                       type="text"
+                       value={formData.referralCode}
+                       onChange={(e) => handleInputChange('referralCode', e.target.value)}
+                       placeholder="Введите код друга для получения бонусов"
+                       autoComplete="off"
+                       className={`px-4 py-3 border-2 rounded-xl transition-all duration-200 ${
+                         errors.referralCode ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' : 'border-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'
+                       }`}
+                     />
+                     {errors.referralCode && (
+                       <p className="text-red-500 text-sm mt-2 flex items-center">
+                         <AlertCircle className="h-4 w-4 mr-2" />
+                         {errors.referralCode}
+                       </p>
+                     )}
+                     <p className="text-gray-600 text-sm mt-2">
+                       💡 Получите бонусы за регистрацию по коду друга!
+                     </p>
+                   </div>
                  </div>
 
                 <div className="flex justify-end pt-4">
@@ -476,7 +509,7 @@ export default function Register() {
                      type="button"
                      onClick={handleNext}
                      disabled={!formData.name || !formData.email || !formData.phone || !formData.location || !formData.password || !formData.confirmPassword}
-                     className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                     className="px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                    >
                     <div className="flex items-center space-x-2">
                       <span>Продолжить</span>
@@ -497,9 +530,9 @@ export default function Register() {
                   </label>
                   <div className="grid grid-cols-3 gap-6">
                     {[
-                      { value: 'ИП', label: 'ИП', icon: Building, description: 'Индивидуальный предприниматель', color: 'blue' },
-                      { value: 'Юр. лицо', label: 'Юр. лицо', icon: Building, description: 'Юридическое лицо', color: 'purple' },
-                      { value: 'Самозанятый', label: 'Самозанятый', icon: UserCheck, description: 'Самозанятый', color: 'green' }
+                      { value: 'ИП', label: 'ИП', icon: Building, description: 'Индивидуальный предприниматель', color: 'primary' },
+                      { value: 'Юр. лицо', label: 'Юр. лицо', icon: Building, description: 'Юридическое лицо', color: 'secondary' },
+                      { value: 'Самозанятый', label: 'Самозанятый', icon: UserCheck, description: 'Самозанятый', color: 'primary' }
                     ].map(option => (
                       <button
                         key={option.value}
@@ -511,7 +544,7 @@ export default function Register() {
                             : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                         }`}
                       >
-                        <div className={`w-12 h-12 bg-gradient-to-br from-${option.color}-500 to-${option.color === 'blue' ? 'indigo' : option.color === 'purple' ? 'pink' : 'emerald'}-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md`}>
+                        <div className={`w-12 h-12 bg-gradient-to-br from-${option.color}-600 to-${option.color}-700 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md`}>
                           <option.icon className="h-6 w-6 text-white" />
                         </div>
                         <div className="font-semibold text-lg mb-1">{option.label}</div>
@@ -539,7 +572,7 @@ export default function Register() {
                       onChange={(e) => handleInputChange('description', e.target.value)}
                       placeholder="Опишите, какие услуги вы предоставляете..."
                       rows={3}
-                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                      className={`w-full px-3 py-2 border border-secondary-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                         errors.description ? 'border-red-500' : ''
                       }`}
                     />
@@ -595,21 +628,27 @@ export default function Register() {
 
                                      <div>
                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                       Категории услуг
+                       Категории услуг ({formData.categories.length}/3)
                      </label>
                      {categories.length > 0 ? (
                        <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                         {categories.map(category => (
-                           <label key={category.id} className="flex items-center space-x-2">
-                             <input
-                               type="checkbox"
-                               checked={formData.categories.includes(category.id)}
-                               onChange={() => handleCategoryToggle(category.id)}
-                               className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                             />
-                             <span className="text-sm">{category.name}</span>
-                           </label>
-                         ))}
+                         {categories.map(category => {
+                           const isSelected = formData.categories.includes(category.id)
+                           const isDisabled = !isSelected && formData.categories.length >= 3
+                           
+                           return (
+                             <label key={category.id} className={`flex items-center space-x-2 ${isDisabled ? 'opacity-50' : ''}`}>
+                               <input
+                                 type="checkbox"
+                                 checked={isSelected}
+                                 onChange={() => handleCategoryToggle(category.id)}
+                                 disabled={isDisabled}
+                                 className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 disabled:cursor-not-allowed"
+                               />
+                               <span className="text-sm">{category.name}</span>
+                             </label>
+                           )
+                         })}
                        </div>
                      ) : (
                        <div className="text-gray-500 text-sm py-2">
@@ -659,7 +698,7 @@ export default function Register() {
                     type="button"
                     variant="outline"
                     onClick={handleBack}
-                    className="px-8 py-3 border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 font-semibold rounded-xl transition-all duration-200"
+                    className="px-8 py-3 border-2 border-secondary-300 text-gray-700 hover:border-secondary-400 hover:bg-secondary-50 font-semibold rounded-xl transition-all duration-200"
                   >
                     <div className="flex items-center space-x-2">
                       <span>←</span>
@@ -670,7 +709,7 @@ export default function Register() {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {isLoading ? (
                       <div className="flex items-center space-x-2">
@@ -692,8 +731,8 @@ export default function Register() {
             {step === 2 && formData.role === 'client' && (
               <div className="space-y-6">
                 <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <UserCheck className="h-8 w-8 text-green-600" />
+                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <UserCheck className="h-8 w-8 text-primary-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     Готово к регистрации!
@@ -702,7 +741,7 @@ export default function Register() {
                     Проверьте введенные данные и завершите регистрацию
                   </p>
                   
-                  <div className="bg-gray-50 rounded-lg p-4 text-left">
+                  <div className="bg-secondary-50 rounded-lg p-4 text-left">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <span className="font-medium text-gray-700">Имя:</span>
@@ -729,7 +768,7 @@ export default function Register() {
                     type="button"
                     variant="outline"
                     onClick={handleBack}
-                    className="px-8 py-3 border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 font-semibold rounded-xl transition-all duration-200"
+                    className="px-8 py-3 border-2 border-secondary-300 text-gray-700 hover:border-secondary-400 hover:bg-secondary-50 font-semibold rounded-xl transition-all duration-200"
                   >
                     <div className="flex items-center space-x-2">
                       <span>←</span>
@@ -740,7 +779,7 @@ export default function Register() {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {isLoading ? (
                       <div className="flex items-center space-x-2">
@@ -762,17 +801,31 @@ export default function Register() {
 
         {/* Ссылка на вход */}
         <div className="mt-8 text-center">
-          <div className="p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl border border-gray-200">
+          <div className="p-4 bg-gradient-to-r from-secondary-50 to-secondary-100 rounded-xl border border-secondary-200">
             <p className="text-gray-600 text-lg">
               Уже есть аккаунт?{' '}
               <a 
                 href="/auth/login" 
-                className="text-blue-600 hover:text-blue-700 font-semibold underline decoration-2 underline-offset-4 hover:decoration-blue-400 transition-all duration-200"
+                className="text-primary-600 hover:text-primary-700 font-semibold underline decoration-2 underline-offset-4 hover:decoration-primary-400 transition-all duration-200"
               >
                 Войти в систему
               </a>
             </p>
           </div>
+        </div>
+        
+        {/* Кнопка выхода */}
+        <div className="mt-4 text-center">
+          <button 
+            onClick={() => {
+              localStorage.removeItem('currentUser')
+              localStorage.removeItem('adminAuth')
+              window.location.reload()
+            }}
+            className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
+          >
+            🚪 Выйти из системы
+          </button>
         </div>
       </div>
     </div>

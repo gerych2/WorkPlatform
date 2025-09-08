@@ -1,396 +1,628 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Header } from '../../../../components/layout/Header'
 import { Button } from '../../../../components/ui/Button'
-import { Clock, CheckCircle, XCircle, AlertCircle, Star, MessageCircle, Phone } from 'lucide-react'
+import { Notification } from '../../../../components/ui/Notification'
+import { safeBase64Encode } from '../../../../lib/utils'
+import { 
+  Clock, 
+  MapPin, 
+  Phone, 
+  User, 
+  CheckCircle,
+  Loader2,
+  DollarSign,
+  Calendar,
+  Filter,
+  Eye,
+  MessageSquare,
+  Star
+} from 'lucide-react'
+
+interface Order {
+  id: number
+  serviceDescription: string
+  status: string
+  totalPrice: number | null
+  priceType: string
+  orderDate: string
+  orderTime: string
+  address: string
+  urgency: string
+  estimatedDuration: number | null
+  preferredTime: string
+  specialRequirements: string | null
+  notes: string | null
+  createdAt: string
+  category: {
+    id: number
+    name: string
+  }
+  client: {
+    id: number
+    name: string
+    email: string
+    phone: string
+    clientRating?: number
+    clientReviewsCount?: number
+  }
+  executor?: {
+    id: number
+    name: string
+    email: string
+    phone: string
+  }
+}
 
 export default function ClientOrders() {
-  const [selectedStatus, setSelectedStatus] = useState('')
-  const [selectedPeriod, setSelectedPeriod] = useState('')
-  const [userOrders, setUserOrders] = useState<any[]>([])
+  const router = useRouter()
+  const [orders, setOrders] = useState<Order[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [showReviewModal, setShowReviewModal] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [reviewData, setReviewData] = useState({
+    rating: 5,
+    comment: ''
+  })
+  const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null)
 
-  // Загружаем заказы пользователя при монтировании компонента
+  const showNotification = (type: 'success' | 'error', message: string) => {
+    setNotification({ type, message })
+    setTimeout(() => setNotification(null), 5000)
+  }
+  
+  // Фильтры
+  const [filters, setFilters] = useState({
+    status: '',
+    urgency: '',
+    dateFrom: '',
+    dateTo: ''
+  })
+
   useEffect(() => {
-    const savedOrders = localStorage.getItem('userOrders')
-    if (savedOrders) {
+    // Проверяем аутентификацию
+    const checkAuth = async () => {
       try {
-        const parsedOrders = JSON.parse(savedOrders)
-        setUserOrders(parsedOrders)
+        const userStr = localStorage.getItem('currentUser')
+        if (userStr) {
+          const user = JSON.parse(userStr)
+          if (user && user.id && user.role === 'client') {
+            setCurrentUser(user)
+            setIsAuthenticated(true)
+            return user
+          }
+        }
+        router.push('/auth/login')
+        return null
       } catch (error) {
-        console.error('Ошибка при загрузке заказов:', error)
+        console.error('Error checking auth:', error)
+        router.push('/auth/login')
+        return null
       }
     }
-  }, [])
 
-  const statuses = [
-    { value: '', label: 'Все статусы' },
-    { value: 'pending', label: 'Ожидает подтверждения', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'confirmed', label: 'Подтвержден', color: 'bg-blue-100 text-blue-800' },
-    { value: 'in_progress', label: 'В работе', color: 'bg-purple-100 text-purple-800' },
-    { value: 'completed', label: 'Завершен', color: 'bg-green-100 text-green-800' },
-    { value: 'cancelled', label: 'Отменен', color: 'bg-red-100 text-red-800' }
-  ]
+    checkAuth().then(user => {
+      if (user) {
+        fetchOrders(user)
+      }
+    })
+  }, [router])
 
-  const periods = [
-    { value: '', label: 'Все время' },
-    { value: 'week', label: 'За неделю' },
-    { value: 'month', label: 'За месяц' },
-    { value: 'quarter', label: 'За квартал' },
-    { value: 'year', label: 'За год' }
-  ]
+  const fetchOrders = async (user?: any) => {
+    try {
+      const userToUse = user || currentUser
+      if (!userToUse) {
+        console.error('No user provided to fetchOrders')
+        return
+      }
+      
+      console.log('Fetching orders for user:', userToUse.id)
+      const params = new URLSearchParams()
+      params.append('clientId', userToUse.id)
+      if (filters.status) params.append('status', filters.status)
+      if (filters.urgency) params.append('urgency', filters.urgency)
+      if (filters.dateFrom) params.append('dateFrom', filters.dateFrom)
+      if (filters.dateTo) params.append('dateTo', filters.dateTo)
 
-  // Моковые данные заказов
-  const orders = [
-    {
-      id: 1,
-      service: 'Ремонт электрики',
-              executor: 'Электрик',
-      status: 'completed',
-      date: '15.12.2024',
-      time: '14:00',
-      price: '3000 ₽',
-      rating: 5,
-      review: 'Отличная работа! Мастер пришел вовремя, все сделал качественно и быстро.',
-      executorPhone: '+7 (999) 123-45-67',
-      address: 'ул. Тверская, д. 15, кв. 23',
-      description: 'Нужно починить розетку в спальне и заменить выключатель в коридоре'
-    },
-    {
-      id: 2,
-      service: 'Установка сантехники',
-              executor: 'Сантехник',
-      status: 'in_progress',
-      date: '20.12.2024',
-      time: '10:00',
-      price: '4500 ₽',
-      rating: null,
-      review: null,
-      executorPhone: '+7 (999) 234-56-78',
-      address: 'ул. Арбат, д. 8, кв. 45',
-      description: 'Установить новую раковину в ванной комнате'
-    },
-    {
-      id: 3,
-      service: 'Уборка квартиры',
-      executor: 'Елена Смирнова',
-      status: 'confirmed',
-      date: '22.12.2024',
-      time: '16:00',
-      price: '1200 ₽',
-      rating: null,
-      review: null,
-      executorPhone: '+7 (999) 345-67-89',
-      address: 'ул. Покровка, д. 12, кв. 67',
-      description: 'Генеральная уборка двухкомнатной квартиры'
-    },
-    {
-      id: 4,
-      service: 'Ремонт компьютера',
-      executor: 'Сергей Волков',
-      status: 'cancelled',
-      date: '18.12.2024',
-      time: '12:00',
-      price: '2000 ₽',
-      rating: null,
-      review: null,
-      executorPhone: '+7 (999) 456-78-90',
-      address: 'ул. Маросейка, д. 5, кв. 12',
-      description: 'Удалить вирусы и настроить систему'
-    },
-    {
-      id: 5,
-      service: 'Парикмахерские услуги',
-      executor: 'Анна Козлова',
-      status: 'completed',
-      date: '10.12.2024',
-      time: '15:00',
-      price: '1800 ₽',
-      rating: 4,
-      review: 'Хорошая стрижка, мастер внимательная. Рекомендую!',
-      executorPhone: '+7 (999) 567-89-01',
-      address: 'ул. Мясницкая, д. 20, кв. 34',
-      description: 'Стрижка и укладка волос'
+      const response = await fetch(`/api/orders?${params.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${safeBase64Encode(JSON.stringify(userToUse))}`
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Orders fetched:', data)
+        setOrders(data.orders || [])
+      } else {
+        console.error('Failed to fetch orders:', response.status)
+        setOrders([])
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error)
+    } finally {
+      setIsLoading(false)
     }
-  ]
+  }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return <Clock className="h-4 w-4" />
-      case 'confirmed':
-        return <CheckCircle className="h-4 w-4" />
-      case 'in_progress':
-        return <AlertCircle className="h-4 w-4" />
-      case 'completed':
-        return <CheckCircle className="h-4 w-4" />
-      case 'cancelled':
-        return <XCircle className="h-4 w-4" />
-      default:
-        return <Clock className="h-4 w-4" />
+  const handleFilterChange = (field: string, value: string) => {
+    setFilters(prev => ({ ...prev, [field]: value }))
+  }
+
+  // Дебаунс для фильтров
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (isAuthenticated && currentUser) {
+        fetchOrders(currentUser)
+      }
+    }, 500) // 500ms задержка
+
+    return () => clearTimeout(timeoutId)
+  }, [filters.status, filters.urgency, filters.dateFrom, filters.dateTo, isAuthenticated, currentUser])
+
+  const getStatusText = (status: string) => {
+    const statusMap: { [key: string]: string } = {
+      'pending': 'Ожидает исполнителя',
+      'confirmed': 'Подтвержден',
+      'in_progress': 'В работе',
+      'completed': 'Завершен',
+      'cancelled': 'Отменен'
     }
+    return statusMap[status] || status
   }
 
   const getStatusColor = (status: string) => {
-    const statusObj = statuses.find(s => s.value === status)
-    return statusObj?.color || 'bg-gray-100 text-gray-800'
+    const colorMap: { [key: string]: string } = {
+      'pending': 'bg-yellow-100 text-yellow-800',
+      'confirmed': 'bg-primary-100 text-primary-800',
+      'in_progress': 'bg-secondary-100 text-secondary-800',
+      'completed': 'bg-green-100 text-green-800',
+      'cancelled': 'bg-red-100 text-red-800'
+    }
+    return colorMap[status] || 'bg-gray-100 text-gray-800'
   }
 
-  const getStatusText = (status: string) => {
-    const statusObj = statuses.find(s => s.value === status)
-    return statusObj?.label || 'Неизвестно'
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency) {
+      case 'low': return 'text-green-600 bg-green-100'
+      case 'medium': return 'text-yellow-600 bg-yellow-100'
+      case 'high': return 'text-red-600 bg-red-100'
+      default: return 'text-gray-600 bg-gray-100'
+    }
   }
 
-  // Используем реальные заказы пользователя или fallback на моковые данные
-  const ordersToDisplay = userOrders.length > 0 ? userOrders : orders
-  
-  const filteredOrders = ordersToDisplay.filter(order => {
-    const matchesStatus = !selectedStatus || order.status === selectedStatus
-    // Здесь можно добавить фильтрацию по периоду
-    return matchesStatus
-  })
-
-  const getTotalSpent = () => {
-    return filteredOrders
-      .filter(order => order.status === 'completed')
-      .reduce((total, order) => total + parseInt(order.price), 0)
+  const getUrgencyText = (urgency: string) => {
+    switch (urgency) {
+      case 'low': return 'Низкая'
+      case 'medium': return 'Средняя'
+      case 'high': return 'Высокая'
+      default: return 'Средняя'
+    }
   }
 
-  const getCompletedOrders = () => {
-    return filteredOrders.filter(order => order.status === 'completed').length
+  const handleCancelOrder = async (orderId: number) => {
+    if (!confirm('Вы уверены, что хотите отменить заказ?')) return
+
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${safeBase64Encode(JSON.stringify(currentUser))}`
+        },
+        body: JSON.stringify({
+          status: 'cancelled'
+        })
+      })
+
+      if (response.ok) {
+        alert('Заказ отменен')
+        fetchOrders(currentUser)
+      } else {
+        const errorData = await response.json()
+        alert(errorData.error || 'Ошибка при отмене заказа')
+      }
+    } catch (error) {
+      console.error('Error cancelling order:', error)
+      alert('Произошла ошибка при отмене заказа')
+    }
+  }
+
+  const handleSubmitReview = async () => {
+    if (!currentUser || !selectedOrder || !selectedOrder.executor) return
+
+    const reviewPayload = {
+      orderId: selectedOrder.id,
+      clientId: currentUser.id,
+      executorId: selectedOrder.executor.id,
+      reviewerId: currentUser.id, // Клиент оставляет отзыв
+      reviewedId: selectedOrder.executor.id, // На исполнителя
+      rating: reviewData.rating,
+      comment: reviewData.comment
+    }
+
+    // Принудительно добавляем поля, если они undefined
+    if (!reviewPayload.reviewerId) {
+      reviewPayload.reviewerId = currentUser.id
+    }
+    if (!reviewPayload.reviewedId) {
+      reviewPayload.reviewedId = selectedOrder.executor.id
+    }
+
+    console.log('Клиент отправляет отзыв:', reviewPayload)
+
+    try {
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${safeBase64Encode(JSON.stringify(currentUser))}`
+        },
+        body: JSON.stringify(reviewPayload)
+      })
+
+      if (response.ok) {
+        showNotification('success', 'Отзыв успешно оставлен!')
+        setShowReviewModal(false)
+        setSelectedOrder(null)
+        setReviewData({ rating: 5, comment: '' })
+        fetchOrders(currentUser)
+      } else {
+        const errorData = await response.json()
+        showNotification('error', `Ошибка при отправке отзыва: ${errorData.error}`)
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error)
+      showNotification('error', 'Ошибка при отправке отзыва')
+    }
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-primary-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Проверка аутентификации...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-              <Header userRole="client" userName="Клиент" notificationsCount={2} />
+    <div className="min-h-screen bg-secondary-50">
+      <Header />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Заголовок и статистика */}
+      {/* Уведомления */}
+      {notification && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onClose={() => setNotification(null)}
+        />
+      )}
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Заголовок */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-primary-900 mb-2">
             Мои заказы
           </h1>
           <p className="text-gray-600">
-            История всех ваших заказов и взаимодействий с мастерами
+            Управляйте своими заказами и отслеживайте их статус
           </p>
-        </div>
-
-        {/* Статистика */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="card p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Clock className="h-6 w-6 text-blue-600" />
+          
+          {/* Рейтинг клиента */}
+          {currentUser.clientRating && Number(currentUser.clientRating) > 0 && (
+            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-center">
+                <div className="flex items-center">
+                  <Star className="h-5 w-5 text-yellow-500 mr-2" />
+                  <span className="text-lg font-semibold text-yellow-800">
+                    {Number(currentUser.clientRating).toFixed(1)}
+                  </span>
+                  <span className="text-yellow-600 ml-2">
+                    ({currentUser.clientReviewsCount || 0} отзывов)
+                  </span>
+                </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Всего заказов</p>
-                <p className="text-2xl font-bold text-gray-900">{filteredOrders.length}</p>
-              </div>
+              <p className="text-sm text-yellow-700 mt-1">
+                Ваш рейтинг как клиента
+              </p>
             </div>
-          </div>
-
-          <div className="card p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Завершено</p>
-                <p className="text-2xl font-bold text-gray-900">{getCompletedOrders()}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="card p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Star className="h-6 w-6 text-purple-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Потрачено</p>
-                <p className="text-2xl font-bold text-gray-900">{getTotalSpent()} ₽</p>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Фильтры */}
-        <div className="card mb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <Filter className="h-5 w-5 mr-2 text-primary-600" />
+            Фильтры
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Статус
+              </label>
               <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="input-field"
+                value={filters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
               >
-                {statuses.map(status => (
-                  <option key={status.value} value={status.value}>
-                    {status.label}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="input-field"
-              >
-                {periods.map(period => (
-                  <option key={period.value} value={period.value}>
-                    {period.label}
-                  </option>
-                ))}
+                <option value="">Все статусы</option>
+                <option value="pending">Ожидает исполнителя</option>
+                <option value="confirmed">Подтвержден</option>
+                <option value="in_progress">В работе</option>
+                <option value="completed">Завершен</option>
+                <option value="cancelled">Отменен</option>
               </select>
             </div>
 
-            <Button variant="outline" size="sm">
-              Экспорт заказов
-            </Button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Срочность
+              </label>
+              <select
+                value={filters.urgency}
+                onChange={(e) => handleFilterChange('urgency', e.target.value)}
+                className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+              >
+                <option value="">Любая срочность</option>
+                <option value="low">Низкая</option>
+                <option value="medium">Средняя</option>
+                <option value="high">Высокая</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Дата от
+              </label>
+              <input
+                type="date"
+                value={filters.dateFrom}
+                onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+                className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Дата до
+              </label>
+              <input
+                type="date"
+                value={filters.dateTo}
+                onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+                className="w-full px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+              />
+            </div>
           </div>
         </div>
 
         {/* Список заказов */}
-        <div className="space-y-6">
-          {filteredOrders.map(order => (
-            <div key={order.id} className="card hover:shadow-lg transition-shadow duration-200">
-              <div className="flex flex-col lg:flex-row lg:items-start space-y-4 lg:space-y-0 lg:space-x-6">
-                {/* Основная информация */}
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-1">
-                        {order.service}
-                      </h3>
-                      <p className="text-gray-600">Мастер: {order.executor}</p>
-                    </div>
-                    
-                    <div className="text-right">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
-                        {getStatusIcon(order.status)}
-                        <span className="ml-1">{getStatusText(order.status)}</span>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <Loader2 className="h-12 w-12 text-primary-600 animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Загрузка заказов...</p>
+          </div>
+        ) : orders.length > 0 ? (
+          <div className="space-y-6">
+            {orders.map((order) => (
+              <div key={order.id} className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6 hover:shadow-md transition-shadow">
+                {/* Заголовок заказа */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {order.serviceDescription}
+                    </h3>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <span className="flex items-center">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        {order.address}
                       </span>
-                      <p className="text-lg font-semibold text-primary-600 mt-1">{order.price}</p>
+                      <span className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        {new Date(order.orderDate).toLocaleDateString('ru-RU')}
+                      </span>
+                      <span className="flex items-center">
+                        <Clock className="h-4 w-4 mr-1" />
+                        {order.orderTime}
+                      </span>
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Дата и время</p>
-                      <p className="text-gray-900">{order.date} в {order.time}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Адрес</p>
-                      <p className="text-gray-900">{order.address}</p>
+                  <div className="text-right">
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                      {getStatusText(order.status)}
+                    </span>
+                    <div className="mt-2">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getUrgencyColor(order.urgency)}`}>
+                        {getUrgencyText(order.urgency)}
+                      </span>
                     </div>
                   </div>
-
-                  <div className="mb-4">
-                    <p className="text-sm text-gray-500 mb-1">Описание заказа</p>
-                    <p className="text-gray-900">{order.description}</p>
-                  </div>
-
-                  {/* Рейтинг и отзыв */}
-                  {order.rating && (
-                    <div className="mb-4">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <div className="flex items-center space-x-1">
-                          <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                          <span className="text-sm font-medium text-gray-700">{order.rating}/5</span>
-                        </div>
-                      </div>
-                      {order.review && (
-                        <div className="bg-gray-50 p-3 rounded-lg">
-                          <p className="text-sm text-gray-700">{order.review}</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
 
+                {/* Детали заказа */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Категория</p>
+                    <p className="font-medium text-gray-900">{order.category.name}</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm text-gray-600">Стоимость</p>
+                    <p className="font-bold text-primary-600 text-lg">
+                      {order.priceType === 'negotiable' ? (
+                        <span className="text-gray-500">По договоренности</span>
+                      ) : (
+                        `${order.totalPrice} BYN`
+                      )}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm text-gray-600">Создан</p>
+                    <p className="font-medium text-gray-900">
+                      {new Date(order.createdAt).toLocaleDateString('ru-RU')}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Информация об исполнителе */}
+                {order.executor && (
+                  <div className="border-t border-secondary-200 pt-4 mb-4">
+                    <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                      <User className="h-4 w-4 mr-1" />
+                      Исполнитель
+                    </h4>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-900">{order.executor.name}</p>
+                        <p className="text-sm text-gray-600">{order.executor.phone}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Дополнительная информация */}
+                {(order.notes || order.specialRequirements) && (
+                  <div className="border-t border-secondary-200 pt-4 mb-4">
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">Дополнительная информация</h4>
+                    <div className="space-y-2 text-sm text-gray-600">
+                      {order.notes && (
+                        <p><strong>Заметки:</strong> {order.notes}</p>
+                      )}
+                      {order.specialRequirements && (
+                        <p><strong>Особые требования:</strong> {order.specialRequirements}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Действия */}
-                <div className="lg:text-right lg:min-w-[200px]">
-                  <div className="space-y-3">
-                    {/* Кнопки действий в зависимости от статуса */}
+                <div className="border-t border-secondary-200 pt-4">
+                  <div className="flex space-x-3">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => router.push(`/dashboard/client/orders/${order.id}`)}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Подробнее
+                    </Button>
+                    
                     {order.status === 'pending' && (
-                      <>
-                        <Button variant="outline" className="w-full">
-                          <MessageCircle className="h-4 w-4 mr-2" />
-                          Написать мастеру
-                        </Button>
-                        <Button variant="outline" className="w-full">
-                          Отменить заказ
-                        </Button>
-                      </>
+                      <Button
+                        onClick={() => handleCancelOrder(order.id)}
+                        variant="outline"
+                        className="flex-1 text-red-600 border-red-300 hover:bg-red-50"
+                      >
+                        Отменить заказ
+                      </Button>
                     )}
-
-                    {order.status === 'confirmed' && (
-                      <>
-                        <Button className="w-full">
-                          <Phone className="h-4 w-4 mr-2" />
-                          Позвонить мастеру
-                        </Button>
-                        <Button variant="outline" className="w-full">
-                          <MessageCircle className="h-4 w-4 mr-2" />
-                          Написать сообщение
-                        </Button>
-                      </>
-                    )}
-
-                    {order.status === 'in_progress' && (
-                      <>
-                        <Button variant="outline" className="w-full">
-                          <MessageCircle className="h-4 w-4 mr-2" />
-                          Связаться с мастером
-                        </Button>
-                        <Button variant="outline" className="w-full">
-                          Отследить прогресс
-                        </Button>
-                      </>
-                    )}
-
-                    {order.status === 'completed' && !order.rating && (
-                      <Button className="w-full">
+                    
+                    {order.status === 'completed' && order.executor && (
+                      <Button 
+                        className="flex-1"
+                        onClick={() => {
+                          setSelectedOrder(order)
+                          setShowReviewModal(true)
+                        }}
+                      >
                         <Star className="h-4 w-4 mr-2" />
                         Оставить отзыв
                       </Button>
                     )}
-
-                    {order.status === 'completed' && (
-                      <Button variant="outline" className="w-full">
-                        Повторить заказ
-                      </Button>
-                    )}
-
-                    {/* Контактная информация */}
-                    <div className="pt-3 border-t border-gray-200">
-                      <p className="text-xs text-gray-500 mb-2">Контакт мастера:</p>
-                      <p className="text-sm text-gray-900">{order.executorPhone}</p>
-                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Пустое состояние */}
-        {filteredOrders.length === 0 && (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Clock className="h-12 w-12 text-gray-400" />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Clock className="h-8 w-8 text-secondary-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Заказы не найдены
+              Заказов пока нет
             </h3>
-            <p className="text-gray-500 mb-6">
-              Попробуйте изменить фильтры или создайте новый заказ
+            <p className="text-gray-600 mb-4">
+              Создайте свой первый заказ, чтобы найти подходящего мастера
             </p>
-            <Button>
-              Найти мастера
+            <Button onClick={() => router.push('/dashboard/client/booking')}>
+              Создать заказ
             </Button>
           </div>
         )}
-      </main>
+      </div>
+
+      {/* Модальное окно для отзыва */}
+      {showReviewModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-xl font-semibold mb-4">Оставить отзыв</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Оценка
+                </label>
+                <div className="flex space-x-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewData({ ...reviewData, rating: star })}
+                      className={`text-2xl ${
+                        star <= reviewData.rating ? 'text-yellow-400' : 'text-gray-300'
+                      }`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Комментарий (необязательно)
+                </label>
+                <textarea
+                  value={reviewData.comment}
+                  onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value })}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  rows={3}
+                  placeholder="Расскажите о качестве выполненной работы..."
+                />
+              </div>
+            </div>
+            
+            <div className="flex space-x-3 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowReviewModal(false)
+                  setSelectedOrder(null)
+                }}
+                className="flex-1"
+              >
+                Отмена
+              </Button>
+              <Button
+                onClick={handleSubmitReview}
+                className="flex-1"
+              >
+                Отправить отзыв
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
-} 
+}

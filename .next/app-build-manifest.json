@@ -11,40 +11,20 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/dashboard/client/page": [
+    "/admin/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/client/page.js"
+      "static/chunks/app/admin/page.js"
     ],
-    "/dashboard/client/orders/page": [
+    "/admin/login/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/client/orders/page.js"
+      "static/chunks/app/admin/login/page.js"
     ],
-    "/dashboard/executor/page": [
+    "/admin/orders/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/executor/page.js"
-    ],
-    "/dashboard/executor/profile/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/executor/profile/page.js"
-    ],
-    "/dashboard/executor/subscription/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/executor/subscription/page.js"
-    ],
-    "/dashboard/executor/orders/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/executor/orders/page.js"
-    ],
-    "/dashboard/executor/calendar/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/executor/calendar/page.js"
+      "static/chunks/app/admin/orders/page.js"
     ]
   }
 }

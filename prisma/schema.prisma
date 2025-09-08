@@ -32,9 +32,42 @@ model User {
   registrationDate   DateTime           @default(now()) @map("registration_date")
   lastLogin          DateTime?          @map("last_login")
   location           String?            @db.VarChar(200)
+  bio                String?            @db.Text
   isVerified         Boolean            @default(false) @map("is_verified")
+  verificationStatus String?            @map("verification_status") @db.VarChar(20)
   legalStatus        String?            @map("legal_status") @db.VarChar(50)
   createdAt          DateTime           @default(now()) @map("created_at")
+  // Поля для рейтинга клиента
+  clientRating       Decimal            @default(0) @map("client_rating") @db.Decimal(3, 2)
+  clientReviewsCount Int                @default(0) @map("client_reviews_count")
+  // Поля для системы контроля качества
+  violationsCount    Int                @default(0) @map("violations_count")
+  lastViolationDate  DateTime?          @map("last_violation_date")
+  isBlocked          Boolean            @default(false) @map("is_blocked")
+  blockStartDate     DateTime?          @map("block_start_date")
+  blockEndDate       DateTime?          @map("block_end_date")
+  blockReason        String?            @map("block_reason") @db.VarChar(255)
+  // Поля для геймификации
+  experiencePoints   Int                @default(0) @map("experience_points")
+  currentLevel       Int                @default(1) @map("current_level")
+  totalXpEarned      Int                @default(0) @map("total_xp_earned")
+  lastXpEarned       DateTime?          @map("last_xp_earned")
+  dailyXpEarned      Int                @default(0) @map("daily_xp_earned")
+  weeklyXpEarned     Int                @default(0) @map("weekly_xp_earned")
+  monthlyXpEarned    Int                @default(0) @map("monthly_xp_earned")
+  // Поля для реферальной системы
+  referralCode       String?            @unique @map("referral_code") @db.VarChar(20)
+  referredBy         Int?               @map("referred_by")
+  referralCount      Int                @default(0) @map("referral_count")
+  referralEarnings   Decimal            @default(0) @map("referral_earnings") @db.Decimal(10, 2)
+  // Поля для достижений
+  achievements       UserAchievement[]
+  xpHistory          XpHistory[]
+  // Поля для реферальной системы
+  referrerRewards    ReferralReward[]   @relation("ReferrerRewards")
+  referredRewards    ReferralReward[]   @relation("ReferredRewards")
+  referredByUser     User?              @relation("UserReferrals", fields: [referredBy], references: [id])
+  referredUsers      User[]             @relation("UserReferrals")
   complaintsAgainst  Complaint[]        @relation("ComplaintsAgainst")
   complaintsFiled    Complaint[]        @relation("ComplaintsFiled")
   resolvedComplaints Complaint[]        @relation("ResolvedComplaints")
@@ -46,7 +79,16 @@ model User {
   executorOrders     Order[]            @relation("ExecutorOrders")
   clientReviews      Review[]           @relation("ReviewClient")
   executorReviews    Review[]           @relation("ReviewExecutor")
+  reviewsGiven       Review[]           @relation("Reviewer")
+  reviewsReceived    Review[]           @relation("Reviewed")
   subscriptions      Subscription[]
+  verifications      Verification[]
+  workingHours       WorkingHours[]
+  calendarEvents     CalendarEvent[]
+  violations         Violation[]
+  supportTickets     SupportTicket[] @relation("SupportTickets")
+  supportMessages    SupportMessage[] @relation("SupportMessages")
+  assignedTickets    SupportTicket[] @relation("AssignedTickets")
 
   @@map("users")
 }
@@ -63,6 +105,8 @@ model ExecutorProfile {
   completedOrders Int      @default(0) @map("completed_orders")
   rating          Decimal  @default(0) @db.Decimal(3, 2)
   reviewsCount    Int      @default(0) @map("reviews_count")
+  isVerified      Boolean  @default(false) @map("is_verified")
+  verificationStatus String @default("pending") @map("verification_status") @db.VarChar(20)
   createdAt       DateTime @default(now()) @map("created_at")
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -89,7 +133,10 @@ model ExecutorDocument {
 model Subscription {
   id            Int                @id @default(autoincrement())
   userId        Int                @map("user_id")
+  plan          String?            @db.VarChar(50) // monthly, yearly, lifetime
   planType      PlanType           @map("plan_type")
+  price         Decimal?           @db.Decimal(10, 2)
+  autoRenew     Boolean            @default(false) @map("auto_renew")
   startDate     DateTime           @map("start_date")
   endDate       DateTime           @map("end_date")
   status        SubscriptionStatus @default(active) @map("status")
@@ -103,8 +150,14 @@ model Subscription {
 
 model Order {
   id                 Int         @id @default(autoincrement())
+  title              String?     @db.VarChar(200)
+  description        String?     @db.Text
+  price              Decimal?    @db.Decimal(10, 2)
+  priority           String?     @default("medium") @db.VarChar(20) // low, medium, high, urgent
+  deadline           DateTime?   @db.Timestamp
+  location           String?     @db.VarChar(200)
   clientId           Int         @map("client_id")
-  executorId         Int         @map("executor_id")
+  executorId         Int?        @map("executor_id")
   categoryId         Int         @map("category_id")
   serviceDescription String      @map("service_description")
   address            String
@@ -112,16 +165,25 @@ model Order {
   clientName         String      @map("client_name") @db.VarChar(200)
   notes              String?
   orderDate          DateTime    @map("order_date") @db.Date
-  orderTime          DateTime    @map("order_time") @db.Time(6)
-  totalPrice         Decimal     @map("total_price") @db.Decimal(10, 2)
+  orderTime          String      @map("order_time") @db.VarChar(10)
+  totalPrice         Decimal?    @map("total_price") @db.Decimal(10, 2)
+  priceType          String      @default("fixed") @map("price_type") @db.VarChar(20) // fixed, negotiable
+  urgency            String      @default("medium") @db.VarChar(20) // low, medium, high
+  estimatedDuration  Decimal?    @map("estimated_duration") @db.Decimal(5, 2) // в часах
+  preferredTime      String      @default("any") @map("preferred_time") @db.VarChar(20) // morning, afternoon, evening, any
+  specialRequirements String?    @map("special_requirements")
   status             OrderStatus @default(pending) @map("status")
+  cancelledAt        DateTime?   @map("cancelled_at")
+  cancellationReason String?     @map("cancellation_reason") @db.VarChar(500)
+  completedAt        DateTime?   @map("completed_at")
   createdAt          DateTime    @default(now()) @map("created_at")
   updatedAt          DateTime    @default(now()) @map("updated_at")
   complaints         Complaint[]
   category           Category    @relation(fields: [categoryId], references: [id])
   client             User        @relation("ClientOrders", fields: [clientId], references: [id], onDelete: Cascade)
-  executor           User        @relation("ExecutorOrders", fields: [executorId], references: [id], onDelete: Cascade)
+  executor           User?       @relation("ExecutorOrders", fields: [executorId], references: [id], onDelete: Cascade)
   reviews            Review[]
+  violations         Violation[]
 
   @@map("orders")
 }
@@ -131,11 +193,15 @@ model Review {
   orderId    Int      @map("order_id")
   clientId   Int      @map("client_id")
   executorId Int      @map("executor_id")
+  reviewerId Int      @map("reviewer_id") // Кто оставил отзыв (clientId или executorId)
+  reviewedId Int      @map("reviewed_id") // На кого отзыв (clientId или executorId)
   rating     Int
   comment    String?
   createdAt  DateTime @default(now()) @map("created_at")
   client     User     @relation("ReviewClient", fields: [clientId], references: [id], onDelete: Cascade)
   executor   User     @relation("ReviewExecutor", fields: [executorId], references: [id], onDelete: Cascade)
+  reviewer   User     @relation("Reviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewed   User     @relation("Reviewed", fields: [reviewedId], references: [id], onDelete: Cascade)
   order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("reviews")
@@ -147,6 +213,7 @@ model Notification {
   title     String   @db.VarChar(200)
   message   String
   type      String   @db.VarChar(50)
+  metadata  Json?    // Дополнительные данные
   isRead    Boolean  @default(false) @map("is_read")
   createdAt DateTime @default(now()) @map("created_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -172,6 +239,17 @@ model Complaint {
   resolvedByUser User?           @relation("ResolvedComplaints", fields: [resolvedBy], references: [id])
 
   @@map("complaints")
+}
+
+model Verification {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  status     String   @db.VarChar(20) // verified, partial, failed
+  results    String   // JSON string with verification results
+  verifiedAt DateTime @default(now()) @map("verified_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("verifications")
 }
 
 enum ComplaintStatus {
@@ -218,4 +296,184 @@ enum VerificationStatus {
   pending
   verified
   rejected
+}
+
+model WorkingHours {
+  id         Int    @id @default(autoincrement())
+  executorId Int    @map("executor_id")
+  dayOfWeek  Int    @map("day_of_week") // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  startTime  String @map("start_time")  // Format: "HH:MM"
+  endTime    String @map("end_time")    // Format: "HH:MM"
+  isWorking  Boolean @default(true) @map("is_working")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  
+  executor   User   @relation(fields: [executorId], references: [id], onDelete: Cascade)
+
+  @@map("working_hours")
+}
+
+model CalendarEvent {
+  id          Int      @id @default(autoincrement())
+  executorId  Int      @map("executor_id")
+  title       String   @db.VarChar(200)
+  description String?  @db.Text
+  date        DateTime
+  time        String   // Format: "HH:MM"
+  duration    Int      @default(1) // Duration in hours
+  type        String   @default("personal") @db.VarChar(20) // "personal", "break", "unavailable"
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  executor    User     @relation(fields: [executorId], references: [id], onDelete: Cascade)
+
+  @@map("calendar_events")
+}
+
+model Violation {
+  id          Int      @id @default(autoincrement())
+  executorId  Int      @map("executor_id")
+  orderId     Int      @map("order_id")
+  type        String   @db.VarChar(50) // "uncompleted_order", "late_cancellation", etc.
+  reason      String?  @db.Text
+  severity    Int      @default(1) // 1 = warning, 2 = 3-day block, 3 = 7-day block, 4 = 30-day block
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  executor    User     @relation(fields: [executorId], references: [id], onDelete: Cascade)
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("violations")
+}
+
+// Модели для геймификации
+model Achievement {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(100)
+  description String?  @db.Text
+  icon        String   @db.VarChar(50)
+  xpReward    Int      @default(0) @map("xp_reward")
+  category    String   @db.VarChar(50) // "orders", "reviews", "referrals", "activity"
+  rarity      String   @default("common") @db.VarChar(20) // "common", "rare", "epic", "legendary"
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            Int         @id @default(autoincrement())
+  userId        Int         @map("user_id")
+  achievementId Int         @map("achievement_id")
+  earnedAt      DateTime    @default(now()) @map("earned_at")
+  xpEarned      Int         @default(0) @map("xp_earned")
+  isNotified    Boolean     @default(false) @map("is_notified")
+  
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model XpHistory {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  xpAmount    Int      @map("xp_amount")
+  source      String   @db.VarChar(50) // "order", "review", "referral", "achievement", "daily_login"
+  description String?  @db.Text
+  metadata    Json?    // Дополнительные данные (ID заказа, тип достижения и т.д.)
+  earnedAt    DateTime @default(now()) @map("earned_at")
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("xp_history")
+}
+
+model Level {
+  id          Int      @id @default(autoincrement())
+  level       Int      @unique
+  title       String   @db.VarChar(100)
+  description String?  @db.Text
+  icon        String   @db.VarChar(50)
+  xpRequired  Int      @map("xp_required")
+  benefits    Json?    // Список привилегий уровня
+  color       String   @default("#6B7280") @db.VarChar(20)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("levels")
+}
+
+model ReferralReward {
+  id              Int      @id @default(autoincrement())
+  referrerId      Int      @map("referrer_id")
+  referredId      Int      @map("referred_id")
+  rewardType      String   @db.VarChar(50) // "xp", "bonus", "achievement"
+  rewardAmount    Decimal  @map("reward_amount") @db.Decimal(10, 2)
+  xpAmount        Int      @default(0) @map("xp_amount")
+  description     String?  @db.Text
+  isPaid          Boolean  @default(false) @map("is_paid")
+  paidAt          DateTime? @map("paid_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  
+  referrer User @relation("ReferrerRewards", fields: [referrerId], references: [id], onDelete: Cascade)
+  referred User @relation("ReferredRewards", fields: [referredId], references: [id], onDelete: Cascade)
+
+  @@map("referral_rewards")
+}
+
+model Quest {
+  id            Int       @id @default(autoincrement())
+  title         String    @db.VarChar(200)
+  description   String    @db.Text
+  icon          String    @db.VarChar(50)
+  xpReward      Int       @map("xp_reward")
+  category      String    @db.VarChar(50) // "daily", "weekly", "monthly", "special", "event"
+  difficulty    String    @db.VarChar(20) // "easy", "medium", "hard", "expert"
+  isActive      Boolean   @default(true) @map("is_active")
+  isRepeatable  Boolean   @default(false) @map("is_repeatable")
+  maxCompletions Int?     @map("max_completions")
+  requirements  String?   @db.Text
+  deadline      DateTime? @db.Timestamp
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("quests")
+}
+
+model SupportTicket {
+  id          Int           @id @default(autoincrement())
+  userId      Int           @map("user_id")
+  subject     String        @db.VarChar(200)
+  description String        @db.Text
+  category    String        @db.VarChar(50) // "technical", "billing", "general", "bug", "feature"
+  priority    String        @default("medium") @db.VarChar(20) // "low", "medium", "high", "urgent"
+  status      String        @default("open") @db.VarChar(20) // "open", "in_progress", "resolved", "closed"
+  assignedTo  Int?          @map("assigned_to")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  resolvedAt  DateTime?     @map("resolved_at")
+  
+  user        User          @relation("SupportTickets", fields: [userId], references: [id], onDelete: Cascade)
+  assignedAdmin User?       @relation("AssignedTickets", fields: [assignedTo], references: [id])
+  messages    SupportMessage[]
+  
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id        Int          @id @default(autoincrement())
+  ticketId  Int          @map("ticket_id")
+  userId    Int          @map("user_id")
+  message   String       @db.Text
+  isFromAdmin Boolean    @default(false) @map("is_from_admin")
+  createdAt DateTime     @default(now()) @map("created_at")
+  
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user      User          @relation("SupportMessages", fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("support_messages")
 }

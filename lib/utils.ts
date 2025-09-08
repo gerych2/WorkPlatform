@@ -36,3 +36,27 @@ export function formatPhone(phone: string): string {
   }
   return phone
 }
+
+// Безопасное кодирование в base64 для UTF-8 строк
+export function safeBase64Encode(str: string): string {
+  try {
+    // Сначала кодируем в UTF-8, затем в base64
+    return btoa(unescape(encodeURIComponent(str)))
+  } catch (error) {
+    console.error('Error encoding to base64:', error)
+    // Fallback: используем простой btoa для ASCII строк
+    return btoa(str)
+  }
+}
+
+// Безопасное декодирование из base64 для UTF-8 строк
+export function safeBase64Decode(str: string): string {
+  try {
+    // Сначала декодируем из base64, затем из UTF-8
+    return decodeURIComponent(escape(atob(str)))
+  } catch (error) {
+    console.error('Error decoding from base64:', error)
+    // Fallback: используем простой atob для ASCII строк
+    return atob(str)
+  }
+}

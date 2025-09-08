@@ -264,6 +264,11 @@ const initializeDefaultData = () => {
         }
       }
     ]
+    const defaultCategories = [
+      { id: 1, name: 'Дизайн', description: 'Графический дизайн, веб-дизайн', icon: '🎨', isActive: true, executorCount: 0, orderCount: 0, createdAt: new Date() },
+      { id: 2, name: 'Разработка', description: 'Веб-разработка, мобильные приложения', icon: '💻', isActive: true, executorCount: 0, orderCount: 0, createdAt: new Date() },
+      { id: 3, name: 'Маркетинг', description: 'SMM, контекстная реклама', icon: '📈', isActive: true, executorCount: 0, orderCount: 0, createdAt: new Date() }
+    ]
     localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(defaultCategories))
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(defaultUsers))
     console.log('Данные по умолчанию сохранены в localStorage')
@@ -285,7 +290,7 @@ if (typeof window !== 'undefined') {
   const categories = JSON.parse(localStorage.getItem(STORAGE_KEYS.CATEGORIES) || '[]')
   console.log('Создано пользователей:', users.length)
   console.log('Создано категорий:', categories.length)
-  console.log('Пользователи:', users.map(u => ({ email: u.email, role: u.role })))
+  console.log('Пользователи:', users.map((u: any) => ({ email: u.email, role: u.role })))
   
   // Если данных нет, создаем их принудительно
   if (users.length === 0) {

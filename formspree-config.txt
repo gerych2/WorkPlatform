@@ -1,0 +1,13 @@
+# Добавьте в ваш .env файл:
+
+# Formspree настройки
+FORMSPREE_ENDPOINT="https://formspree.io/f/ваш-endpoint-здесь"
+
+# Пример:
+# FORMSPREE_ENDPOINT="https://formspree.io/f/xpzgkqwe"
+
+# Отключите Gmail настройки (закомментируйте):
+# EMAIL_HOST="smtp.gmail.com"
+# EMAIL_PORT="587"
+# EMAIL_USER="skodagrodno2006@gmail.com"
+# EMAIL_PASS="viweeljguatzdgrk"

@@ -29,10 +29,10 @@ export async function POST(request: Request) {
       )
     }
 
-    // Проверяем, что пользователь активен
-    if (user.status === 'pending') {
+    // Проверяем, что исполнитель активен (клиенты могут входить сразу)
+    if (user.role === 'executor' && user.status === 'pending') {
       return NextResponse.json(
-        { error: 'Ваш аккаунт ожидает подтверждения администратора.' },
+        { error: 'Ваш аккаунт исполнителя ожидает подтверждения администратора.' },
         { status: 403 }
       )
     }

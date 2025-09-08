@@ -1,402 +1,595 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Header } from '../../../../components/layout/Header'
 import { Button } from '../../../../components/ui/Button'
-import { Bell, Shield, Eye, Lock, Smartphone, Mail, Globe, Clock, User, MapPin } from 'lucide-react'
+import { Input } from '../../../../components/ui/Input'
+import { 
+  Settings, 
+  Bell, 
+  Shield, 
+  Eye, 
+  EyeOff, 
+  Save, 
+  Loader2,
+  CheckCircle,
+  AlertTriangle,
+  MessageSquare
+} from 'lucide-react'
+import SupportSystem from '../../../../components/support/SupportSystem'
 
 export default function ClientSettings() {
+  const router = useRouter()
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [activeTab, setActiveTab] = useState('notifications')
+
+  // Настройки уведомлений
   const [notifications, setNotifications] = useState({
-    email: true,
-    sms: true,
-    push: false,
-    newOrders: true,
+    emailNotifications: true,
+    smsNotifications: false,
+    pushNotifications: true,
     orderUpdates: true,
     promotions: false,
-    reminders: true
+    securityAlerts: true
   })
 
+  // Настройки конфиденциальности
   const [privacy, setPrivacy] = useState({
-    showProfile: true,
-    showOrders: false,
-    showReviews: true,
-    showLocation: false
+    profileVisibility: 'public',
+    showPhone: true,
+    showEmail: false,
+    allowMessages: true
   })
 
-  const [preferences, setPreferences] = useState({
-    language: 'ru',
-    timezone: 'Europe/Minsk',
-    currency: 'BYN',
-    autoReminders: true
+  // Смена пароля
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   })
 
-  const [security, setSecurity] = useState({
-    twoFactor: false,
-    loginNotifications: true,
-    sessionTimeout: 30 // минуты
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
   })
 
-  const handleNotificationChange = (key: string, value: boolean) => {
-    setNotifications(prev => ({ ...prev, [key]: value }))
+  const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    // Проверяем аутентификацию
+    const checkAuth = async () => {
+      try {
+        const userStr = localStorage.getItem('currentUser')
+        if (userStr) {
+          const user = JSON.parse(userStr)
+          if (user && user.id && user.role === 'client') {
+            setCurrentUser(user)
+            setIsAuthenticated(true)
+            return user
+          }
+        }
+        router.push('/auth/login')
+        return null
+      } catch (error) {
+        console.error('Error checking auth:', error)
+        router.push('/auth/login')
+        return null
+      }
+    }
+
+    checkAuth().then(user => {
+      if (user) {
+        loadSettings()
+      }
+    })
+  }, [router])
+
+  const loadSettings = async () => {
+    try {
+      // В реальном приложении здесь был бы запрос к API для загрузки настроек
+      // Пока используем значения по умолчанию
+      setIsLoading(false)
+    } catch (error) {
+      console.error('Error loading settings:', error)
+      setIsLoading(false)
+    }
   }
 
-  const handlePrivacyChange = (key: string, value: boolean) => {
-    setPrivacy(prev => ({ ...prev, [key]: value }))
+  const handleNotificationChange = (field: string, value: boolean) => {
+    setNotifications(prev => ({ ...prev, [field]: value }))
   }
 
-  const handlePreferenceChange = (key: string, value: any) => {
-    setPreferences(prev => ({ ...prev, [key]: value }))
+  const handlePrivacyChange = (field: string, value: string | boolean) => {
+    setPrivacy(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleSecurityChange = (key: string, value: any) => {
-    setSecurity(prev => ({ ...prev, [key]: value }))
+  const handlePasswordChange = (field: string, value: string) => {
+    setPasswordForm(prev => ({ ...prev, [field]: value }))
+    if (passwordErrors[field]) {
+      setPasswordErrors(prev => ({ ...prev, [field]: '' }))
+    }
   }
 
-  const handleSaveSettings = () => {
-    localStorage.setItem('clientSettings', JSON.stringify({
-      notifications,
-      privacy,
-      preferences,
-      security
-    }))
-    alert('Настройки сохранены!')
+  const validatePasswordForm = (): boolean => {
+    const newErrors: Record<string, string> = {}
+
+    if (!passwordForm.currentPassword) {
+      newErrors.currentPassword = 'Текущий пароль обязателен'
+    }
+    if (!passwordForm.newPassword) {
+      newErrors.newPassword = 'Новый пароль обязателен'
+    }
+    if (passwordForm.newPassword.length < 6) {
+      newErrors.newPassword = 'Пароль должен содержать минимум 6 символов'
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      newErrors.confirmPassword = 'Пароли не совпадают'
+    }
+
+    setPasswordErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSaveNotifications = async () => {
+    setIsSaving(true)
+    try {
+      // В реальном приложении здесь был бы запрос к API
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      alert('Настройки уведомлений сохранены!')
+    } catch (error) {
+      console.error('Error saving notifications:', error)
+      alert('Ошибка при сохранении настроек')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleSavePrivacy = async () => {
+    setIsSaving(true)
+    try {
+      // В реальном приложении здесь был бы запрос к API
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      alert('Настройки конфиденциальности сохранены!')
+    } catch (error) {
+      console.error('Error saving privacy:', error)
+      alert('Ошибка при сохранении настроек')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleChangePassword = async () => {
+    if (!validatePasswordForm()) return
+
+    setIsSaving(true)
+    try {
+      // В реальном приложении здесь был бы запрос к API
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      alert('Пароль успешно изменен!')
+      setPasswordForm({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      })
+    } catch (error) {
+      console.error('Error changing password:', error)
+      alert('Ошибка при смене пароля')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-primary-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Проверка аутентификации...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-primary-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Загрузка настроек...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-              <Header userRole="client" userName="Клиент" notificationsCount={2} />
-      
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-secondary-50">
+      <Header />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Заголовок */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-primary-900 mb-2">
             Настройки
           </h1>
           <p className="text-gray-600">
-            Управляйте настройками аккаунта и предпочтениями
+            Управляйте настройками своего аккаунта
           </p>
         </div>
 
-        <div className="space-y-6">
-          {/* Уведомления */}
-          <div className="card">
-            <div className="flex items-center space-x-3 mb-6">
-              <Bell className="h-6 w-6 text-primary-600" />
-              <h2 className="text-xl font-semibold text-gray-900">
+        {/* Вкладки */}
+        <div className="mb-8">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setActiveTab('notifications')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'notifications'
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <Bell className="h-4 w-4 inline mr-2" />
                 Уведомления
-              </h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Mail className="h-5 w-5 text-gray-500" />
-                  <div>
-                    <h4 className="font-medium text-gray-900">Email уведомления</h4>
-                    <p className="text-sm text-gray-600">Получать уведомления на email</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={notifications.email}
-                    onChange={(e) => handleNotificationChange('email', e.target.checked)}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Smartphone className="h-5 w-5 text-gray-500" />
-                  <div>
-                    <h4 className="font-medium text-gray-900">SMS уведомления</h4>
-                    <p className="text-sm text-gray-600">Получать SMS о статусе заказов</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={notifications.sms}
-                    onChange={(e) => handleNotificationChange('sms', e.target.checked)}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Bell className="h-5 w-5 text-gray-500" />
-                  <div>
-                    <h4 className="font-medium text-gray-900">Push уведомления</h4>
-                    <p className="text-sm text-gray-600">Получать уведомления в браузере</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={notifications.push}
-                    onChange={(e) => handleNotificationChange('push', e.target.checked)}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Clock className="h-5 w-5 text-gray-500" />
-                  <div>
-                    <h4 className="font-medium text-gray-900">Напоминания</h4>
-                    <p className="text-sm text-gray-600">Напоминания о предстоящих заказах</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={notifications.reminders}
-                    onChange={(e) => handleNotificationChange('reminders', e.target.checked)}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Globe className="h-5 w-5 text-gray-500" />
-                  <div>
-                    <h4 className="font-medium text-gray-900">Акции и предложения</h4>
-                    <p className="text-sm text-gray-600">Получать информацию об акциях</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={notifications.promotions}
-                    onChange={(e) => handleNotificationChange('promotions', e.target.checked)}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          {/* Предпочтения */}
-          <div className="card">
-            <div className="flex items-center space-x-3 mb-6">
-              <User className="h-6 w-6 text-primary-600" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                Предпочтения
-              </h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-200 rounded-lg">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Язык
-                  </label>
-                  <select
-                    value={preferences.language}
-                    onChange={(e) => handlePreferenceChange('language', e.target.value)}
-                    className="input-field"
-                  >
-                    <option value="ru">Русский</option>
-                    <option value="be">Беларуская</option>
-                    <option value="en">English</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Часовой пояс
-                  </label>
-                  <select
-                    value={preferences.timezone}
-                    onChange={(e) => handlePreferenceChange('timezone', e.target.value)}
-                    className="input-field"
-                  >
-                    <option value="Europe/Minsk">Минск (UTC+3)</option>
-                    <option value="Europe/London">Лондон (UTC+0)</option>
-                    <option value="America/New_York">Нью-Йорк (UTC-5)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-200 rounded-lg">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Валюта
-                  </label>
-                  <select
-                    value={preferences.currency}
-                    onChange={(e) => handlePreferenceChange('currency', e.target.value)}
-                    className="input-field"
-                  >
-                    <option value="BYN">Белорусский рубль (BYN)</option>
-                    <option value="USD">Доллар США (USD)</option>
-                    <option value="EUR">Евро (EUR)</option>
-                  </select>
-                </div>
-                
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Автоматические напоминания</h4>
-                    <p className="text-sm text-gray-600">Напоминания о заказах</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      checked={preferences.autoReminders}
-                      onChange={(e) => handlePreferenceChange('autoReminders', e.target.checked)}
-                      className="sr-only peer" 
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Приватность */}
-          <div className="card">
-            <div className="flex items-center space-x-3 mb-6">
-              <Eye className="h-6 w-6 text-primary-600" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                Приватность
-              </h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-gray-900">Показывать профиль</h4>
-                  <p className="text-sm text-gray-600">Мастера могут видеть ваш профиль</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={privacy.showProfile}
-                    onChange={(e) => handlePrivacyChange('showProfile', e.target.checked)}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-gray-900">Показывать местоположение</h4>
-                  <p className="text-sm text-gray-600">Мастера видят ваш район</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={privacy.showLocation}
-                    onChange={(e) => handlePrivacyChange('showLocation', e.target.checked)}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-gray-900">Показывать отзывы</h4>
-                  <p className="text-sm text-gray-600">Ваши отзывы видны мастерам</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={privacy.showReviews}
-                    onChange={(e) => handlePrivacyChange('showReviews', e.target.checked)}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          {/* Безопасность */}
-          <div className="card">
-            <div className="flex items-center space-x-3 mb-6">
-              <Shield className="h-6 w-6 text-primary-600" />
-              <h2 className="text-xl font-semibold text-gray-900">
+              </button>
+              <button
+                onClick={() => setActiveTab('privacy')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'privacy'
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <Shield className="h-4 w-4 inline mr-2" />
+                Конфиденциальность
+              </button>
+              <button
+                onClick={() => setActiveTab('password')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'password'
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <Settings className="h-4 w-4 inline mr-2" />
                 Безопасность
-              </h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Lock className="h-5 w-5 text-gray-500" />
-                  <div>
-                    <h4 className="font-medium text-gray-900">Двухфакторная аутентификация</h4>
-                    <p className="text-sm text-gray-600">Дополнительная защита аккаунта</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={security.twoFactor}
-                    onChange={(e) => handleSecurityChange('twoFactor', e.target.checked)}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Bell className="h-5 w-5 text-gray-500" />
-                  <div>
-                    <h4 className="font-medium text-gray-900">Уведомления о входе</h4>
-                    <p className="text-sm text-gray-600">Получать уведомления о новых входах</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={security.loginNotifications}
-                    onChange={(e) => handleSecurityChange('loginNotifications', e.target.checked)}
-                    className="sr-only peer" 
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                </label>
-              </div>
-
-              <div className="p-4 border border-gray-200 rounded-lg">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Таймаут сессии (минуты)
-                </label>
-                <input
-                  type="number"
-                  value={security.sessionTimeout}
-                  onChange={(e) => handleSecurityChange('sessionTimeout', parseInt(e.target.value))}
-                  className="input-field"
-                  min="15"
-                  max="120"
-                />
-                <p className="text-sm text-gray-600 mt-1">
-                  Автоматический выход из аккаунта при неактивности
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Кнопка сохранения */}
-          <div className="flex justify-end">
-            <Button onClick={handleSaveSettings} className="px-8">
-              Сохранить настройки
-            </Button>
+              </button>
+              <button
+                onClick={() => setActiveTab('support')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'support'
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <MessageSquare className="h-4 w-4 inline mr-2" />
+                Поддержка
+              </button>
+            </nav>
           </div>
         </div>
-      </main>
+
+        {/* Контент вкладок */}
+        {activeTab === 'notifications' && (
+          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+              <Bell className="h-5 w-5 mr-2 text-primary-600" />
+              Уведомления
+            </h2>
+            <Button
+              onClick={handleSaveNotifications}
+              disabled={isSaving}
+              className="flex items-center"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Сохранить
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between py-3 border-b border-secondary-100">
+              <div>
+                <p className="font-medium text-gray-900">Email уведомления</p>
+                <p className="text-sm text-gray-600">Получать уведомления на email</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={notifications.emailNotifications}
+                  onChange={(e) => handleNotificationChange('emailNotifications', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between py-3 border-b border-secondary-100">
+              <div>
+                <p className="font-medium text-gray-900">SMS уведомления</p>
+                <p className="text-sm text-gray-600">Получать уведомления по SMS</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={notifications.smsNotifications}
+                  onChange={(e) => handleNotificationChange('smsNotifications', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between py-3 border-b border-secondary-100">
+              <div>
+                <p className="font-medium text-gray-900">Push уведомления</p>
+                <p className="text-sm text-gray-600">Получать push уведомления в браузере</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={notifications.pushNotifications}
+                  onChange={(e) => handleNotificationChange('pushNotifications', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between py-3 border-b border-secondary-100">
+              <div>
+                <p className="font-medium text-gray-900">Обновления заказов</p>
+                <p className="text-sm text-gray-600">Уведомления о статусе заказов</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={notifications.orderUpdates}
+                  onChange={(e) => handleNotificationChange('orderUpdates', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between py-3 border-b border-secondary-100">
+              <div>
+                <p className="font-medium text-gray-900">Акции и предложения</p>
+                <p className="text-sm text-gray-600">Уведомления о скидках и акциях</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={notifications.promotions}
+                  onChange={(e) => handleNotificationChange('promotions', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between py-3">
+              <div>
+                <p className="font-medium text-gray-900">Безопасность</p>
+                <p className="text-sm text-gray-600">Уведомления о безопасности аккаунта</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={notifications.securityAlerts}
+                  onChange={(e) => handleNotificationChange('securityAlerts', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+        )}
+
+        {/* Настройки конфиденциальности */}
+        {activeTab === 'privacy' && (
+        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+              <Shield className="h-5 w-5 mr-2 text-primary-600" />
+              Конфиденциальность
+            </h2>
+            <Button
+              onClick={handleSavePrivacy}
+              disabled={isSaving}
+              className="flex items-center"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Сохранить
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between py-3 border-b border-secondary-100">
+              <div>
+                <p className="font-medium text-gray-900">Видимость профиля</p>
+                <p className="text-sm text-gray-600">Кто может видеть ваш профиль</p>
+              </div>
+              <select
+                value={privacy.profileVisibility}
+                onChange={(e) => handlePrivacyChange('profileVisibility', e.target.value)}
+                className="px-3 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+              >
+                <option value="public">Публичный</option>
+                <option value="private">Приватный</option>
+                <option value="friends">Только друзья</option>
+              </select>
+            </div>
+
+            <div className="flex items-center justify-between py-3 border-b border-secondary-100">
+              <div>
+                <p className="font-medium text-gray-900">Показывать телефон</p>
+                <p className="text-sm text-gray-600">Отображать номер телефона в профиле</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={privacy.showPhone}
+                  onChange={(e) => handlePrivacyChange('showPhone', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between py-3 border-b border-secondary-100">
+              <div>
+                <p className="font-medium text-gray-900">Показывать email</p>
+                <p className="text-sm text-gray-600">Отображать email в профиле</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={privacy.showEmail}
+                  onChange={(e) => handlePrivacyChange('showEmail', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between py-3">
+              <div>
+                <p className="font-medium text-gray-900">Разрешить сообщения</p>
+                <p className="text-sm text-gray-600">Позволить другим пользователям писать вам</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={privacy.allowMessages}
+                  onChange={(e) => handlePrivacyChange('allowMessages', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+        )}
+
+        {/* Смена пароля */}
+        {activeTab === 'password' && (
+        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+            <AlertTriangle className="h-5 w-5 mr-2 text-primary-600" />
+            Смена пароля
+          </h2>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Текущий пароль
+              </label>
+              <div className="relative">
+                <Input
+                  type={showPasswords.current ? 'text' : 'password'}
+                  value={passwordForm.currentPassword}
+                  onChange={(e) => handlePasswordChange('currentPassword', e.target.value)}
+                  className={passwordErrors.currentPassword ? 'border-red-500 pr-10' : 'pr-10'}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPasswords(prev => ({ ...prev, current: !prev.current }))}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {passwordErrors.currentPassword && (
+                <p className="text-red-500 text-sm mt-1">{passwordErrors.currentPassword}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Новый пароль
+              </label>
+              <div className="relative">
+                <Input
+                  type={showPasswords.new ? 'text' : 'password'}
+                  value={passwordForm.newPassword}
+                  onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
+                  className={passwordErrors.newPassword ? 'border-red-500 pr-10' : 'pr-10'}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {passwordErrors.newPassword && (
+                <p className="text-red-500 text-sm mt-1">{passwordErrors.newPassword}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Подтвердите новый пароль
+              </label>
+              <div className="relative">
+                <Input
+                  type={showPasswords.confirm ? 'text' : 'password'}
+                  value={passwordForm.confirmPassword}
+                  onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
+                  className={passwordErrors.confirmPassword ? 'border-red-500 pr-10' : 'pr-10'}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {passwordErrors.confirmPassword && (
+                <p className="text-red-500 text-sm mt-1">{passwordErrors.confirmPassword}</p>
+              )}
+            </div>
+
+            <div className="pt-4">
+              <Button
+                onClick={handleChangePassword}
+                disabled={isSaving}
+                className="flex items-center"
+              >
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                {isSaving ? 'Изменение...' : 'Изменить пароль'}
+              </Button>
+            </div>
+          </div>
+        </div>
+        )}
+
+        {/* Служба поддержки */}
+        {activeTab === 'support' && (
+          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+            <SupportSystem userId={currentUser?.id || 1} />
+          </div>
+        )}
+      </div>
     </div>
   )
-} 
+}

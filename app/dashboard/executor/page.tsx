@@ -2,77 +2,153 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Header } from '../../../components/layout/Header'
 import { Button } from '../../../components/ui/Button'
-import { Calendar, Clock, DollarSign, Star, CheckCircle, AlertCircle, User, Settings } from 'lucide-react'
+import { Calendar, Clock, DollarSign, Star, CheckCircle, AlertCircle, User, Settings, Loader2, Crown, AlertTriangle, Trophy } from 'lucide-react'
+import { GamificationDashboard } from '../../../components/gamification/GamificationDashboard'
+
+interface Order {
+  id: number
+  serviceDescription: string
+  status: string
+  totalPrice: number
+  orderDate: string
+  orderTime: string
+  address: string
+  client: {
+    name: string
+    phone: string
+  }
+  category: {
+    name: string
+  }
+}
+
+interface Subscription {
+  id: number
+  planType: string
+  startDate: string
+  endDate: string
+  status: string
+  amount: number
+}
+
+interface ExecutorProfile {
+  id: number
+  rating: number
+  reviewsCount: number
+  completedOrders: number
+  hourlyRate: number | null
+  description: string
+  experience: string
+  categories: number[]
+  isVerified: boolean
+  verificationStatus: string
+}
 
 export default function ExecutorDashboard() {
+  const router = useRouter()
   const [selectedDate, setSelectedDate] = useState(new Date())
-  const [executorOrders, setExecutorOrders] = useState<any[]>([])
+  const [recentOrders, setRecentOrders] = useState<Order[]>([])
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const [executorProfile, setExecutorProfile] = useState<ExecutorProfile | null>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'gamification'>('dashboard')
 
-  // Загружаем заказы для текущего исполнителя
+  // Проверяем аутентификацию и загружаем данные пользователя
   useEffect(() => {
-    loadExecutorOrders()
-  }, [])
-
-  const loadExecutorOrders = () => {
-    const allOrders = JSON.parse(localStorage.getItem('userOrders') || '[]')
-    // Фильтруем заказы для текущего исполнителя (пока что все заказы показываем для демо)
-    setExecutorOrders(allOrders)
-  }
-
-  // Моковые данные для демонстрации
-  const subscription = {
-    status: 'active',
-    plan: 'Месячная подписка',
-    expiresAt: '25.01.2025',
-    price: '180 BYN/мес'
-  }
-
-  const recentOrders = [
-    {
-      id: 1,
-      client: 'Анна Петрова',
-      service: 'Ремонт электрики',
-      date: '22.12.2024',
-      time: '14:00',
-      status: 'pending',
-      price: '180 BYN',
-      address: 'ул. Ленина, д. 25, кв. 12, Минск'
-    },
-    {
-      id: 2,
-      client: 'Михаил Сидоров',
-      service: 'Установка розеток',
-      date: '23.12.2024',
-      time: '10:00',
-      status: 'confirmed',
-      price: '90 BYN',
-      address: 'пр. Независимости, д. 78, кв. 45, Минск'
-    },
-    {
-      id: 3,
-      client: 'Елена Козлова',
-      service: 'Замена проводки',
-      date: '24.12.2024',
-      time: '16:00',
-      status: 'pending',
-      price: '480 BYN',
-      address: 'ул. Богдановича, д. 34, кв. 8, Минск'
+    const checkAuth = async () => {
+      try {
+        const userStr = localStorage.getItem('currentUser')
+        if (userStr) {
+          const user = JSON.parse(userStr)
+          if (user && user.id && user.role === 'executor') {
+            setCurrentUser(user)
+            setIsAuthenticated(true)
+            await fetchData(user)
+          } else {
+            router.push('/auth/login')
+          }
+        } else {
+          router.push('/auth/login')
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error)
+        router.push('/auth/login')
+      }
     }
-  ]
 
-  const earnings = {
-    thisMonth: '2700 BYN',
-    lastMonth: '2280 BYN',
-    total: '7500 BYN'
+    checkAuth()
+  }, [router])
+
+  const fetchData = async (user: any) => {
+    try {
+      // Загружаем все данные параллельно
+      const [profileResponse, subscriptionResponse, ordersResponse] = await Promise.all([
+        fetch(`/api/executor-profile?userId=${user.id}`),
+        fetch(`/api/subscriptions?userId=${user.id}`),
+        fetch('/api/orders?executorId=' + user.id, {
+          headers: {
+            'Authorization': `Bearer ${Buffer.from(JSON.stringify(user)).toString('base64')}`
+          }
+        })
+      ])
+
+      if (profileResponse.ok) {
+        const profileData = await profileResponse.json()
+        setExecutorProfile(profileData.profile)
+      }
+
+      if (subscriptionResponse.ok) {
+        const subscriptionData = await subscriptionResponse.json()
+        if (subscriptionData.subscriptions && subscriptionData.subscriptions.length > 0) {
+          const activeSubscription = subscriptionData.subscriptions.find((sub: Subscription) => 
+            sub.status === 'active' && new Date(sub.endDate) > new Date()
+          )
+          setSubscription(activeSubscription || null)
+        }
+      }
+
+      if (ordersResponse.ok) {
+        const ordersData = await ordersResponse.json()
+        if (ordersData.orders && Array.isArray(ordersData.orders)) {
+          setRecentOrders(ordersData.orders.slice(0, 5)) // Берем только 5 последних заказов
+        } else {
+          setRecentOrders([])
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      setRecentOrders([])
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const stats = {
-    completedOrders: 45,
-    averageRating: 4.8,
-    totalReviews: 38,
-    responseTime: '2.3 ч'
+  // Если не аутентифицирован, показываем загрузку
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-primary-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Проверка аутентификации...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-primary-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Загрузка данных...</p>
+        </div>
+      </div>
+    )
   }
 
   const getStatusColor = (status: string) => {
@@ -114,139 +190,221 @@ export default function ExecutorDashboard() {
     }
   }
 
-  const handleOrderAction = (orderId: number, action: 'confirm' | 'reject') => {
-    const allOrders = JSON.parse(localStorage.getItem('userOrders') || '[]')
-    const updatedOrders = allOrders.map((order: any) => {
-      if (order.id === orderId) {
-        return {
-          ...order,
+  const handleOrderAction = async (orderId: number, action: 'confirm' | 'reject') => {
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Buffer.from(JSON.stringify(currentUser)).toString('base64')}`
+        },
+        body: JSON.stringify({
           status: action === 'confirm' ? 'confirmed' : 'cancelled'
-        }
+        })
+      })
+
+      if (response.ok) {
+        const actionText = action === 'confirm' ? 'подтвержден' : 'отклонен'
+        alert(`Заказ ${actionText}!`)
+        
+        // Заказ обновлен - можно перезагрузить страницу для обновления данных
+        window.location.reload()
+      } else {
+        const errorData = await response.json()
+        alert(`Ошибка: ${errorData.error || 'Не удалось обновить заказ'}`)
       }
-      return order
-    })
-    
-    localStorage.setItem('userOrders', JSON.stringify(updatedOrders))
-    loadExecutorOrders() // Перезагружаем заказы
-    
-    const actionText = action === 'confirm' ? 'подтвержден' : 'отклонен'
-    alert(`Заказ ${actionText}!`)
+    } catch (error) {
+      console.error('Error updating order:', error)
+      alert('Произошла ошибка при обновлении заказа')
+    }
   }
 
-  const handleContactClient = (order: any) => {
-    alert(`Контактная информация клиента:\nТелефон: ${order.phone}\nАдрес: ${order.address}`)
-  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-              <Header userRole="executor" userName="Исполнитель" notificationsCount={3} />
+    <div className="min-h-screen bg-secondary-50">
+      <Header />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Приветствие и статус подписки */}
+        {/* Приветствие */}
         <div className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Добро пожаловать! 👋
-              </h1>
-              <p className="text-gray-600">
-                Управляйте заказами и расписанием
-              </p>
-            </div>
-            
-            {/* Статус подписки */}
-            <div className="mt-4 md:mt-0">
-              <div className="card p-4">
-                <div className="flex items-center space-x-3">
-                  <div className={`w-3 h-3 rounded-full ${
-                    subscription.status === 'active' ? 'bg-green-400' : 'bg-red-400'
-                  }`} />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{subscription.plan}</p>
-                    <p className="text-xs text-gray-500">До {subscription.expiresAt}</p>
+          <h1 className="text-3xl font-bold text-primary-900 mb-2">
+            Добро пожаловать, {currentUser?.name || 'Исполнитель'}! 👋
+          </h1>
+          <p className="text-gray-600">
+            Управляйте заказами и развивайте свой бизнес
+          </p>
+        </div>
+
+        {/* Информация о пользователе */}
+        {currentUser && (
+          <div className="mb-8 p-6 bg-white rounded-lg shadow-sm border border-secondary-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">{currentUser.name}</h2>
+                <p className="text-gray-600">{currentUser.email}</p>
+                <p className="text-gray-600">{currentUser.phone}</p>
+                <p className="text-gray-600">{currentUser.location}</p>
+                {executorProfile && (
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">Опыт: {executorProfile.experience}</p>
+                    <p className="text-sm text-gray-500">
+                      Ставка: {executorProfile.hourlyRate ? `${executorProfile.hourlyRate} BYN/час` : 'Не указана'}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Статус верификации: {executorProfile.isVerified ? 'Верифицирован' : 'На проверке'}
+                    </p>
                   </div>
-                  <span className="text-sm font-medium text-primary-600">{subscription.price}</span>
-                </div>
+                )}
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Статус: {currentUser.status}</p>
+                <p className="text-sm text-gray-500">Правовой статус: {currentUser.legalStatus === 'legal' ? 'Юридическое лицо' : 'Частное лицо'}</p>
               </div>
             </div>
           </div>
-        </div>
+        )}
+        {/* Статус подписки */}
+        {subscription && (
+          <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Crown className="h-6 w-6 text-green-600" />
+                <div>
+                  <h3 className="text-lg font-semibold text-green-900">
+                    Активная подписка
+                  </h3>
+                  <p className="text-green-700">
+                    {subscription.planType} план • Действует до {new Date(subscription.endDate).toLocaleDateString('ru-RU')}
+                  </p>
+                </div>
+              </div>
+              <span className="text-green-700 font-medium">
+                {subscription.amount} BYN
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Статистика */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="card p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
             <div className="flex items-center">
               <div className="p-2 bg-green-100 rounded-lg">
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Выполнено заказов</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.completedOrders}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {executorProfile?.completedOrders || 0}
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="card p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
             <div className="flex items-center">
               <div className="p-2 bg-yellow-100 rounded-lg">
                 <Star className="h-6 w-6 text-yellow-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Средний рейтинг</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.averageRating}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {executorProfile?.rating ? Number(executorProfile.rating).toFixed(1) : '0.0'}
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="card p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Clock className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <Clock className="h-6 w-6 text-primary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Время ответа</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.responseTime}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  24 часа
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="card p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <DollarSign className="h-6 w-6 text-purple-600" />
+              <div className="p-2 bg-secondary-100 rounded-lg">
+                <DollarSign className="h-6 w-6 text-secondary-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Заработок за месяц</p>
-                <p className="text-2xl font-bold text-gray-900">{earnings.thisMonth}</p>
+                <p className="text-sm font-medium text-gray-600">Ставка за час</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {executorProfile?.hourlyRate ? `${executorProfile.hourlyRate} BYN` : 'Не указана'}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Последние заказы */}
-          <div className="lg:col-span-2">
-            <div className="card">
-              <div className="flex items-center justify-between mb-4">
+        {/* Вкладки */}
+        <div className="mb-8">
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-8">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'dashboard'
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                📊 Дашборд
+              </button>
+              <button
+                onClick={() => setActiveTab('gamification')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'gamification'
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <Trophy className="inline h-4 w-4 mr-1" />
+                Геймификация
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        {activeTab === 'dashboard' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Последние заказы */}
+            <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+              <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">
                   Последние заказы
                 </h2>
-                <Button variant="outline" size="sm">
-                  Посмотреть все
-                </Button>
+                <Link href="/dashboard/executor/orders">
+                  <Button variant="outline" size="sm">
+                    Посмотреть все
+                  </Button>
+                </Link>
               </div>
               
-              {(executorOrders.length > 0 ? executorOrders : recentOrders).length > 0 ? (
+              {recentOrders.length > 0 ? (
                 <div className="space-y-4">
-                  {(executorOrders.length > 0 ? executorOrders : recentOrders).map(order => (
-                    <div key={order.id} className="border border-gray-200 rounded-lg p-4">
+                  {recentOrders.map(order => (
+                    <div key={order.id} className="border border-secondary-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                       <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h3 className="font-medium text-gray-900">{order.service}</h3>
-                          <p className="text-sm text-gray-600">Клиент: {order.client || order.name}</p>
-                          <div className="flex items-center space-x-4 mt-1">
-                            <span className="text-sm text-gray-500">{order.date}</span>
-                            <span className="text-sm text-gray-500">{order.time}</span>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-900 mb-1">
+                            {order.serviceDescription}
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-2">
+                            Категория: {order.category?.name}
+                          </p>
+                          <p className="text-sm text-gray-600">Клиент: {order.client.name}</p>
+                          <div className="flex items-center space-x-4 mt-1 text-sm text-gray-500">
+                            <span>{new Date(order.orderDate).toLocaleDateString('ru-RU')}</span>
+                            <span>{order.orderTime}</span>
                           </div>
                           <p className="text-xs text-gray-400 mt-1">{order.address}</p>
                         </div>
@@ -256,7 +414,9 @@ export default function ExecutorDashboard() {
                             {getStatusIcon(order.status)}
                             <span className="ml-1">{getStatusText(order.status)}</span>
                           </span>
-                          <p className="text-lg font-semibold text-primary-600 mt-1">{order.price}</p>
+                          <p className="text-lg font-semibold text-primary-600 mt-2">
+                            {order.totalPrice} BYN
+                          </p>
                         </div>
                       </div>
                       
@@ -280,115 +440,81 @@ export default function ExecutorDashboard() {
                             </Button>
                           </>
                         )}
-                        {order.status === 'confirmed' && (
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="w-full"
-                            onClick={() => handleContactClient(order)}
-                          >
-                            Связаться с клиентом
-                          </Button>
-                        )}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">У вас пока нет заказов</p>
-                  <Button className="mt-4" variant="outline">
-                    Настроить профиль
-                  </Button>
+                  <div className="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Clock className="h-8 w-8 text-secondary-400" />
+                  </div>
+                  <p className="text-gray-600 mb-4">У вас пока нет заказов</p>
+                  <Link href="/dashboard/executor/profile">
+                    <Button variant="outline">
+                      Настроить профиль
+                    </Button>
+                  </Link>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Календарь и быстрые действия */}
+          {/* Боковая панель */}
           <div className="space-y-6">
-            {/* Календарь */}
-            <div className="card">
+            {/* Статус профиля */}
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Календарь
-              </h2>
-              
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900 mb-2">
-                  {selectedDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
-                </div>
-                <p className="text-sm text-gray-600 mb-4">
-                  {selectedDate.toLocaleDateString('ru-RU', { weekday: 'long', year: 'numeric' })}
-                </p>
-                
-                <div className="space-y-2">
-                  <div className="p-2 bg-primary-50 rounded-lg">
-                    <p className="text-sm font-medium text-primary-900">14:00 - Ремонт электрики</p>
-                    <p className="text-xs text-primary-700">Анна Петрова • 180 BYN</p>
-                  </div>
-                  <div className="p-2 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">16:00 - Установка розеток</p>
-                    <p className="text-xs text-gray-500">Михаил Сидоров • 90 BYN</p>
-                  </div>
-                </div>
-                
-                <Button variant="outline" className="w-full mt-4">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Открыть календарь
-                </Button>
-              </div>
-            </div>
-
-            {/* Заработок */}
-            <div className="card">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Заработок
+                Статус профиля
               </h2>
               
               <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Этот месяц:</span>
-                  <span className="text-sm font-medium text-gray-900">{earnings.thisMonth}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Верификация:</span>
+                  <span className={`text-sm font-medium ${
+                    executorProfile?.isVerified ? 'text-green-600' : 'text-yellow-600'
+                  }`}>
+                    {executorProfile?.isVerified ? 'Верифицирован' : 'На проверке'}
+                  </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Прошлый месяц:</span>
-                  <span className="text-sm font-medium text-gray-900">{earnings.lastMonth}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Отзывы:</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {executorProfile?.reviewsCount || 0}
+                  </span>
                 </div>
-                <hr />
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-900">Всего:</span>
-                  <span className="text-lg font-bold text-primary-600">{earnings.total}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Категории:</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {executorProfile?.categories?.length || 0}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Быстрые действия */}
-            <div className="card">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 Быстрые действия
               </h2>
               
               <div className="space-y-3">
-                <Link href="/dashboard/executor/calendar">
+                <Link href="/dashboard/executor/orders">
                   <Button variant="outline" className="w-full justify-start">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Управлять расписанием
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Просмотреть заказы
                   </Button>
                 </Link>
-                <Button variant="outline" className="w-full justify-start">
-                  <Star className="h-4 w-4 mr-2" />
-                  Посмотреть отзывы
-                </Button>
                 <Link href="/dashboard/executor/subscription">
                   <Button variant="outline" className="w-full justify-start">
-                    <DollarSign className="h-4 w-4 mr-2" />
+                    <Crown className="h-4 w-4 mr-2" />
                     Управлять подпиской
                   </Button>
                 </Link>
                 <Link href="/dashboard/executor/profile">
                   <Button variant="outline" className="w-full justify-start">
                     <User className="h-4 w-4 mr-2" />
-                    Профиль
+                    Настроить профиль
                   </Button>
                 </Link>
                 <Link href="/dashboard/executor/settings">
@@ -397,10 +523,21 @@ export default function ExecutorDashboard() {
                     Настройки
                   </Button>
                 </Link>
+                <Link href="/dashboard/executor/violations">
+                  <Button variant="outline" className="w-full justify-start">
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    История нарушений
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
         </div>
+        )}
+
+        {activeTab === 'gamification' && currentUser && (
+          <GamificationDashboard userId={currentUser.id} />
+        )}
       </main>
     </div>
   )

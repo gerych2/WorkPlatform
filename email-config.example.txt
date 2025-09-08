@@ -1,0 +1,16 @@
+# Добавьте эти переменные в ваш .env файл:
+
+# Email Configuration
+EMAIL_HOST="smtp.gmail.com"
+EMAIL_PORT="587"
+EMAIL_USER="your-email@gmail.com"
+EMAIL_PASS="your-app-password"
+
+# App URL
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+# Для Gmail нужно создать App Password:
+# 1. Включите 2FA в Google аккаунте
+# 2. Перейдите в настройки безопасности
+# 3. Создайте "Пароль приложения"
+# 4. Используйте этот пароль в EMAIL_PASS
