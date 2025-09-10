@@ -189,20 +189,20 @@ export default function OrderManagement() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'text-yellow-600 bg-yellow-100'
-      case 'in_progress': return 'text-blue-600 bg-blue-100'
-      case 'completed': return 'text-green-600 bg-green-100'
+      case 'pending': return 'text-secondary-600 bg-secondary-100'
+      case 'in_progress': return 'text-primary-600 bg-primary-100'
+      case 'completed': return 'text-secondary-600 bg-secondary-100'
       case 'cancelled': return 'text-red-600 bg-red-100'
-      case 'disputed': return 'text-orange-600 bg-orange-100'
+      case 'disputed': return 'text-secondary-600 bg-secondary-100'
       default: return 'text-gray-600 bg-gray-100'
     }
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'low': return 'text-green-600 bg-green-100'
-      case 'medium': return 'text-yellow-600 bg-yellow-100'
-      case 'high': return 'text-orange-600 bg-orange-100'
+      case 'low': return 'text-secondary-600 bg-secondary-100'
+      case 'medium': return 'text-secondary-600 bg-secondary-100'
+      case 'high': return 'text-secondary-600 bg-secondary-100'
       case 'urgent': return 'text-red-600 bg-red-100'
       default: return 'text-gray-600 bg-gray-100'
     }
@@ -250,8 +250,8 @@ export default function OrderManagement() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-yellow-100">
-                <Clock className="h-6 w-6 text-yellow-600" />
+              <div className="p-2 rounded-lg bg-secondary-100">
+                <Clock className="h-6 w-6 text-secondary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Ожидают</p>
@@ -264,8 +264,8 @@ export default function OrderManagement() {
           
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-blue-100">
-                <Clock className="h-6 w-6 text-blue-600" />
+              <div className="p-2 rounded-lg bg-primary-100">
+                <Clock className="h-6 w-6 text-primary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">В работе</p>
@@ -278,8 +278,8 @@ export default function OrderManagement() {
           
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-green-100">
-                <CheckCircle className="h-6 w-6 text-green-600" />
+              <div className="p-2 rounded-lg bg-secondary-100">
+                <CheckCircle className="h-6 w-6 text-secondary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Завершены</p>
@@ -306,13 +306,13 @@ export default function OrderManagement() {
           
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-purple-100">
-                <DollarSign className="h-6 w-6 text-purple-600" />
+              <div className="p-2 rounded-lg bg-primary-100">
+                <DollarSign className="h-6 w-6 text-primary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Общая сумма</p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {orders.reduce((sum, o) => sum + (o.price || 0), 0).toLocaleString()} ₽
+                  {orders.reduce((sum, o) => sum + (o.totalPrice || 0), 0).toLocaleString()} ₽
                 </p>
               </div>
             </div>
@@ -600,9 +600,9 @@ export default function OrderManagement() {
                           <span className="text-xs text-gray-500 capitalize">
                             {order.category?.name || 'Не указана'}
                           </span>
-                          {order.location && order.location.trim() !== '' && (
+                          {order.address && order.address.trim() !== '' && (
                             <span className="text-xs text-gray-500 ml-2">
-                              📍 {order.location}
+                              📍 {order.address}
                             </span>
                           )}
                         </div>
@@ -633,8 +633,8 @@ export default function OrderManagement() {
                       {order.executor && order.executor.name ? (
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-8 w-8">
-                            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                              <User className="h-4 w-4 text-blue-600" />
+                            <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center">
+                              <User className="h-4 w-4 text-primary-600" />
                             </div>
                           </div>
                           <div className="ml-3">

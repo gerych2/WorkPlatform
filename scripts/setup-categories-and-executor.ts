@@ -149,7 +149,6 @@ async function main() {
           bio: 'Опытный мастер с 5-летним стажем. Специализируюсь на ремонте бытовой техники и сантехники. Качественно и быстро выполню любую работу.',
           isVerified: true,
           verificationStatus: 'verified',
-          legalStatus: 'individual',
           clientRating: 4.8,
           clientReviewsCount: 15,
           experiencePoints: 150,

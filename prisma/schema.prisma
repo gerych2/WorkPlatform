@@ -35,7 +35,6 @@ model User {
   bio                String?            @db.Text
   isVerified         Boolean            @default(false) @map("is_verified")
   verificationStatus String?            @map("verification_status") @db.VarChar(20)
-  legalStatus        String?            @map("legal_status") @db.VarChar(50)
   createdAt          DateTime           @default(now()) @map("created_at")
   // Поля для рейтинга клиента
   clientRating       Decimal            @default(0) @map("client_rating") @db.Decimal(3, 2)
@@ -89,6 +88,11 @@ model User {
   supportTickets     SupportTicket[] @relation("SupportTickets")
   supportMessages    SupportMessage[] @relation("SupportMessages")
   assignedTickets    SupportTicket[] @relation("AssignedTickets")
+  // Связи для стартапов
+  createdStartups    Startup[] @relation("StartupCreator")
+  startupVolunteers  UserStartup[]
+  assignedStartupTasks StartupTask[] @relation("StartupTaskAssignee")
+  startupUpdates     StartupUpdate[] @relation("StartupUpdateAuthor")
 
   @@map("users")
 }
@@ -476,4 +480,95 @@ model SupportMessage {
   user      User          @relation("SupportMessages", fields: [userId], references: [id], onDelete: Cascade)
   
   @@map("support_messages")
+}
+
+// Модели для системы стартапов
+model Startup {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(200)
+  description String   @db.Text
+  category    String   @db.VarChar(100) // "tech", "business", "social", "environmental", "health", "education"
+  status      String   @default("active") @db.VarChar(20) // "active", "completed", "cancelled", "paused"
+  createdBy   Int      @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Связи
+  creator     User     @relation("StartupCreator", fields: [createdBy], references: [id])
+  volunteers  UserStartup[]
+  tasks       StartupTask[]
+  updates     StartupUpdate[]
+  applications StartupApplication[]
+  
+  @@map("startups")
+}
+
+model UserStartup {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  startupId Int      @map("startup_id")
+  role      String   @default("volunteer") @db.VarChar(20) // "volunteer", "lead", "contributor", "mentor"
+  joinedAt  DateTime @default(now()) @map("joined_at")
+  
+  // Связи
+  user      User     @relation(fields: [userId], references: [id])
+  startup   Startup  @relation(fields: [startupId], references: [id])
+  
+  @@unique([userId, startupId])
+  @@map("user_startups")
+}
+
+model StartupTask {
+  id          Int      @id @default(autoincrement())
+  startupId   Int      @map("startup_id")
+  title       String   @db.VarChar(200)
+  description String   @db.Text
+  status      String   @default("todo") @db.VarChar(20) // "todo", "in_progress", "completed", "cancelled"
+  priority    String   @default("medium") @db.VarChar(20) // "low", "medium", "high", "urgent"
+  assignedTo  Int?     @map("assigned_to")
+  dueDate     DateTime? @map("due_date")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Связи
+  startup     Startup  @relation(fields: [startupId], references: [id])
+  assignee    User?    @relation("StartupTaskAssignee", fields: [assignedTo], references: [id])
+  
+  @@map("startup_tasks")
+}
+
+model StartupUpdate {
+  id        Int      @id @default(autoincrement())
+  startupId Int      @map("startup_id")
+  title     String   @db.VarChar(200)
+  content   String   @db.Text
+  authorId  Int      @map("author_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Связи
+  startup   Startup  @relation(fields: [startupId], references: [id])
+  author    User     @relation("StartupUpdateAuthor", fields: [authorId], references: [id])
+  
+  @@map("startup_updates")
+}
+
+model StartupApplication {
+  id        Int      @id @default(autoincrement())
+  startupId Int      @map("startup_id")
+  name      String   @db.VarChar(200)
+  email     String   @db.VarChar(255)
+  phone     String?  @db.VarChar(20)
+  telegram  String?  @db.VarChar(100)
+  experience String? @db.Text
+  motivation String? @db.Text
+  skills    String?  @db.Text
+  status    String   @default("pending") @db.VarChar(20) // pending, approved, rejected
+  notes     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  // Связи
+  startup   Startup  @relation(fields: [startupId], references: [id])
+  
+  @@map("startup_applications")
 }

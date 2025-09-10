@@ -125,3 +125,5 @@ async function testGamificationSystem() {
 
 // Запускаем тест
 testGamificationSystem()
+
+

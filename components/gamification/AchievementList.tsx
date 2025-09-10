@@ -89,15 +89,15 @@ export const AchievementList: React.FC<AchievementListProps> = ({
           <div className="text-xs text-gray-600">⚪ Обычные</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-blue-500">{achievementsByRarity.rare}</div>
+          <div className="text-2xl font-bold text-primary-500">{achievementsByRarity.rare}</div>
           <div className="text-xs text-gray-600">🔵 Редкие</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-purple-500">{achievementsByRarity.epic}</div>
+          <div className="text-2xl font-bold text-primary-500">{achievementsByRarity.epic}</div>
           <div className="text-xs text-gray-600">🟣 Эпические</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-orange-500">{achievementsByRarity.legendary}</div>
+          <div className="text-2xl font-bold text-secondary-500">{achievementsByRarity.legendary}</div>
           <div className="text-xs text-gray-600">🟠 Легендарные</div>
         </div>
       </div>
@@ -155,3 +155,5 @@ export const AchievementList: React.FC<AchievementListProps> = ({
     </div>
   )
 }
+
+

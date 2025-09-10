@@ -58,7 +58,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary-600 mx-auto mb-4" />
           <p className="text-gray-600">Проверка доступа...</p>
         </div>
       </div>
@@ -71,5 +71,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
 
   return <>{children}</>
 }
+
+
 
 

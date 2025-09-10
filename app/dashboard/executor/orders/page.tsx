@@ -232,20 +232,20 @@ export default function ExecutorOrders() {
 
   const getStatusColor = (status: string) => {
     const colorMap: { [key: string]: string } = {
-      'pending': 'bg-yellow-100 text-yellow-800',
+      'pending': 'bg-secondary-100 text-secondary-800',
       'confirmed': 'bg-primary-100 text-primary-800',
       'in_progress': 'bg-secondary-100 text-secondary-800',
-      'completed': 'bg-green-100 text-green-800',
-      'cancelled': 'bg-red-100 text-red-800'
+      'completed': 'bg-secondary-100 text-secondary-800',
+      'cancelled': 'bg-secondary-100 text-secondary-800'
     }
     return colorMap[status] || 'bg-gray-100 text-gray-800'
   }
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case 'low': return 'text-green-600 bg-green-100'
-      case 'medium': return 'text-yellow-600 bg-yellow-100'
-      case 'high': return 'text-red-600 bg-red-100'
+      case 'low': return 'text-secondary-600 bg-secondary-100'
+      case 'medium': return 'text-secondary-600 bg-secondary-100'
+      case 'high': return 'text-secondary-600 bg-secondary-100'
       default: return 'text-gray-600 bg-gray-100'
     }
   }
@@ -472,8 +472,8 @@ export default function ExecutorOrders() {
         <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <div className="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <AlertTriangle className="h-12 w-12 text-yellow-600" />
+            <div className="w-24 h-24 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertTriangle className="h-12 w-12 text-secondary-600" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
               Требуется активная подписка
@@ -506,20 +506,20 @@ export default function ExecutorOrders() {
 
         {/* Информация о подписке */}
         {subscription && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="mb-6 p-4 bg-secondary-50 border border-secondary-200 rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <CheckCircle className="h-6 w-6 text-green-600" />
+                <CheckCircle className="h-6 w-6 text-secondary-600" />
                 <div>
-                  <h3 className="text-lg font-semibold text-green-900">
+                  <h3 className="text-lg font-semibold text-secondary-900">
                     Активная подписка
                   </h3>
-                  <p className="text-green-700">
+                  <p className="text-secondary-700">
                     {subscription.planType} план • Действует до {new Date(subscription.endDate).toLocaleDateString('ru-RU')}
                   </p>
                 </div>
               </div>
-              <span className="text-green-700 font-medium">
+              <span className="text-secondary-700 font-medium">
                 {subscription.amount} BYN
               </span>
             </div>
@@ -595,132 +595,83 @@ export default function ExecutorOrders() {
             <p className="text-gray-600">Загрузка заказов...</p>
           </div>
         ) : orders.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {orders.map((order) => (
-              <div key={order.id} className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6 hover:shadow-md transition-shadow">
-                {/* Заголовок заказа */}
-                <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <div key={order.id} className="group relative">
+                {/* Glow effect */}
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-1000 group-hover:duration-200"></div>
+                
+                <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:scale-105 border border-gray-100/50 overflow-hidden">
+                  {/* Header with gradient */}
+                  <div className="bg-gradient-to-r from-primary-500 to-secondary-600 p-6 text-white relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+                    
+                    <div className="relative z-10 flex items-start justify-between mb-4">
+                      <div className="flex items-center">
+                        <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl mr-4 group-hover:rotate-6 transition-transform duration-300">
+                          <Calendar className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-white group-hover:text-primary-100 transition-colors duration-300 line-clamp-2">
                             {order.serviceDescription}
                           </h3>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <span className="flex items-center">
-                        <MapPin className="h-4 w-4 mr-1" />
-                        {order.address}
-                      </span>
-                      <span className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        {new Date(order.orderDate).toLocaleDateString('ru-RU')}
-                      </span>
-                            </div>
-                            </div>
-                  <div className="text-right">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
-                      {getStatusText(order.status)}
-                    </span>
-                    <div className="mt-2">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getUrgencyColor(order.urgency)}`}>
-                        <Zap className="h-3 w-3 mr-1" />
-                        {getUrgencyText(order.urgency)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                {/* Детали заказа */}
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Категория:</span>
-                    <span className="font-medium">{order.category.name}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Время выполнения:</span>
-                    <span className="font-medium">{order.orderTime}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Предпочтительное время:</span>
-                    <span className="font-medium">{getPreferredTimeText(order.preferredTime)}</span>
-                  </div>
-                  
-                  {order.estimatedDuration && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Продолжительность:</span>
-                      <span className="font-medium">{order.estimatedDuration} ч</span>
-                          </div>
-                  )}
-                  
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Стоимость:</span>
-                    <span className="font-bold text-primary-600 text-lg">
-                      {order.priceType === 'negotiable' ? (
-                        <span className="flex items-center">
-                          <span className="text-gray-500">По договоренности</span>
-                        </span>
-                      ) : (
-                        `${order.totalPrice} BYN`
-                      )}
-                    </span>
-                          </div>
-                </div>
-
-                {/* Информация о клиенте */}
-                <div className="border-t border-secondary-200 pt-4 mb-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
-                    <User className="h-4 w-4 mr-1" />
-                    Клиент
-                  </h4>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-gray-900">{order.client.name}</p>
-                    <p className="text-gray-600 flex items-center">
-                      <Phone className="h-3 w-3 mr-1" />
-                      {order.client.phone}
-                    </p>
-                    {/* Рейтинг клиента */}
-                    {order.client.clientRating && Number(order.client.clientRating) > 0 && (
-                      <div className="flex items-center">
-                        <Star className="h-3 w-3 text-yellow-400 mr-1" />
-                        <span className="text-xs text-gray-600">
-                          {Number(order.client.clientRating).toFixed(1)} 
-                          ({order.client.clientReviewsCount || 0} отзывов)
-                        </span>
-                      </div>
-                    )}
+                          <p className="text-white/80 text-sm font-medium">
+                            {order.category.name}
+                          </p>
                         </div>
                       </div>
-
-                {/* Дополнительная информация */}
-                {(order.notes || order.specialRequirements) && (
-                  <div className="border-t border-secondary-200 pt-4 mb-4">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Дополнительная информация</h4>
-                    <div className="space-y-2 text-sm text-gray-600">
-                      {order.notes && (
-                        <p><strong>Заметки:</strong> {order.notes}</p>
-                      )}
-                      {order.specialRequirements && (
-                        <p><strong>Особые требования:</strong> {order.specialRequirements}</p>
-                      )}
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${getStatusColor(order.status)}`}>
+                        {getStatusText(order.status)}
+                      </span>
                     </div>
                   </div>
-                )}
+
+                  {/* Content */}
+                  <div className="p-6">
+                    <div className="space-y-4 mb-6">
+                      <div className="flex items-center text-gray-600 text-sm">
+                        <MapPin className="h-4 w-4 mr-2 text-primary-500" />
+                        <span className="line-clamp-1">{order.address}</span>
+                      </div>
+                      <div className="flex items-center text-gray-600 text-sm">
+                        <Clock className="h-4 w-4 mr-2 text-secondary-500" />
+                        <span>{new Date(order.orderDate).toLocaleDateString('ru-RU')} в {order.orderTime}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getUrgencyColor(order.urgency)}`}>
+                          <Zap className="h-3 w-3 mr-1" />
+                          {getUrgencyText(order.urgency)}
+                        </span>
+                        <div className="text-right">
+                          <p className="text-sm text-gray-600">Стоимость</p>
+                          <p className="font-bold text-primary-600 text-lg">
+                            {order.priceType === 'negotiable' ? (
+                              <span className="text-gray-500">По договоренности</span>
+                            ) : (
+                              `${order.totalPrice} BYN`
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+
                   
-                {/* Действия */}
-                <div className="border-t border-secondary-200 pt-4">
-                  <div className="flex space-x-3">
+                    {/* Actions */}
+                    <div className="flex space-x-3 pt-4 border-t border-gray-100">
                     {order.status === 'pending' && !order.executorId && (
                       <>
                         <Button
                           onClick={() => handleAcceptOrder(order.id)}
-                          className="flex-1"
+                          className="flex-1 group-hover:bg-primary-600 transition-all duration-200"
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Принять заказ
                         </Button>
                         <Button 
                           variant="outline" 
-                          className="flex-1"
+                          className="flex-1 group-hover:bg-primary-50 group-hover:border-primary-300 transition-all duration-200"
                           onClick={() => router.push(`/dashboard/executor/orders/${order.id}`)}
                         >
                           <Eye className="h-4 w-4 mr-2" />
@@ -733,7 +684,7 @@ export default function ExecutorOrders() {
                       <>
                         <Button
                           onClick={() => handleAcceptOrder(order.id)}
-                          className="flex-1"
+                          className="flex-1 group-hover:bg-primary-600 transition-all duration-200"
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Подтвердить
@@ -741,7 +692,7 @@ export default function ExecutorOrders() {
                         <Button
                           onClick={() => handleRejectOrder(order.id)}
                           variant="outline"
-                          className="flex-1 text-red-600 border-red-300 hover:bg-red-50"
+                          className="flex-1 text-secondary-600 border-secondary-300 hover:bg-secondary-50 group-hover:border-secondary-400 transition-all duration-200"
                         >
                           <AlertTriangle className="h-4 w-4 mr-2" />
                           Отклонить
@@ -752,7 +703,7 @@ export default function ExecutorOrders() {
                     {order.status === 'confirmed' && order.executorId === currentUser?.id && (
                       <Button 
                         variant="outline" 
-                        className="w-full"
+                        className="w-full group-hover:bg-primary-50 group-hover:border-primary-300 transition-all duration-200"
                         onClick={() => router.push(`/dashboard/executor/orders/${order.id}`)}
                       >
                         <Eye className="h-4 w-4 mr-2" />
@@ -764,14 +715,14 @@ export default function ExecutorOrders() {
                       <>
                         <Button
                           onClick={() => handleCompleteOrder(order.id)}
-                          className="flex-1"
+                          className="flex-1 group-hover:bg-primary-600 transition-all duration-200"
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          Заказ готов
+                          Готово
                         </Button>
                         <Button 
                           variant="outline" 
-                          className="flex-1"
+                          className="flex-1 group-hover:bg-primary-50 group-hover:border-primary-300 transition-all duration-200"
                           onClick={() => router.push(`/dashboard/executor/orders/${order.id}`)}
                         >
                           <Eye className="h-4 w-4 mr-2" />
@@ -784,7 +735,7 @@ export default function ExecutorOrders() {
                       <>
                         <Button 
                           variant="outline" 
-                          className="w-full"
+                          className="flex-1 group-hover:bg-primary-50 group-hover:border-primary-300 transition-all duration-200"
                           onClick={() => router.push(`/dashboard/executor/orders/${order.id}`)}
                         >
                           <Eye className="h-4 w-4 mr-2" />
@@ -792,20 +743,21 @@ export default function ExecutorOrders() {
                         </Button>
                         <Button 
                           variant="outline" 
-                          className="w-full"
+                          className="flex-1 group-hover:bg-secondary-50 group-hover:border-secondary-300 transition-all duration-200"
                           onClick={() => {
                             setSelectedOrder(order)
                             setShowReviewModal(true)
                           }}
                         >
                           <Star className="h-4 w-4 mr-2" />
-                          Оставить отзыв
+                          Отзыв
                         </Button>
                       </>
                     )}
+                    </div>
                   </div>
                 </div>
-                </div>
+              </div>
               ))}
             </div>
         ) : (
@@ -825,7 +777,7 @@ export default function ExecutorOrders() {
 
       {/* Модальное окно для отзыва */}
       {showReviewModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-modal">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold mb-4">
               Оставить отзыв о клиенте
@@ -842,7 +794,7 @@ export default function ExecutorOrders() {
                     type="button"
                     onClick={() => setReviewData(prev => ({ ...prev, rating: star }))}
                     className={`text-2xl ${
-                      star <= reviewData.rating ? 'text-yellow-400' : 'text-gray-300'
+                      star <= reviewData.rating ? 'text-secondary-400' : 'text-gray-300'
                     }`}
                   >
                     ★
@@ -890,10 +842,10 @@ export default function ExecutorOrders() {
 
       {/* Уведомления */}
       {notification && (
-        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+        <div className={`fixed top-4 right-4 z-modal p-4 rounded-lg shadow-lg ${
           notification.type === 'success' 
-            ? 'bg-green-100 text-green-800 border border-green-200' 
-            : 'bg-red-100 text-red-800 border border-red-200'
+            ? 'bg-secondary-100 text-secondary-800 border border-secondary-200' 
+            : 'bg-secondary-100 text-secondary-800 border border-secondary-200'
         }`}>
           <div className="flex items-center justify-between">
             <span>{notification.message}</span>

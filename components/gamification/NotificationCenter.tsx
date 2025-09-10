@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Bell, X, Check, Trophy, Zap, Crown, Gift, CreditCard, MessageSquare, AlertCircle, Reply } from 'lucide-react'
+import { DropdownPortal } from '../ui/DropdownPortal'
 
 interface Notification {
   id: number
@@ -78,21 +79,21 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'level_up':
-        return <Crown className="h-5 w-5 text-yellow-500" />
+        return <Crown className="h-5 w-5 text-secondary-500" />
       case 'achievement':
-        return <Trophy className="h-5 w-5 text-purple-500" />
+        return <Trophy className="h-5 w-5 text-primary-500" />
       case 'xp_gain':
-        return <Zap className="h-5 w-5 text-blue-500" />
+        return <Zap className="h-5 w-5 text-primary-500" />
       case 'referral':
-        return <Gift className="h-5 w-5 text-green-500" />
+        return <Gift className="h-5 w-5 text-secondary-500" />
       case 'subscription':
         return <CreditCard className="h-5 w-5 text-indigo-500" />
       case 'support_ticket_created':
-        return <MessageSquare className="h-5 w-5 text-blue-500" />
+        return <MessageSquare className="h-5 w-5 text-primary-500" />
       case 'support_ticket_admin':
-        return <AlertCircle className="h-5 w-5 text-orange-500" />
+        return <AlertCircle className="h-5 w-5 text-secondary-500" />
       case 'support_ticket_reply':
-        return <Reply className="h-5 w-5 text-green-500" />
+        return <Reply className="h-5 w-5 text-secondary-500" />
       default:
         return <Bell className="h-5 w-5 text-gray-500" />
     }
@@ -101,21 +102,21 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const getNotificationColor = (type: string) => {
     switch (type) {
       case 'level_up':
-        return 'bg-yellow-50 border-yellow-200'
+        return 'bg-secondary-50 border-secondary-200'
       case 'achievement':
-        return 'bg-purple-50 border-purple-200'
+        return 'bg-primary-50 border-primary-200'
       case 'xp_gain':
-        return 'bg-blue-50 border-blue-200'
+        return 'bg-primary-50 border-primary-200'
       case 'referral':
-        return 'bg-green-50 border-green-200'
+        return 'bg-secondary-50 border-secondary-200'
       case 'subscription':
         return 'bg-indigo-50 border-indigo-200'
       case 'support_ticket_created':
-        return 'bg-blue-50 border-blue-200'
+        return 'bg-primary-50 border-primary-200'
       case 'support_ticket_admin':
-        return 'bg-orange-50 border-orange-200'
+        return 'bg-secondary-50 border-secondary-200'
       case 'support_ticket_reply':
-        return 'bg-green-50 border-green-200'
+        return 'bg-secondary-50 border-secondary-200'
       default:
         return 'bg-gray-50 border-gray-200'
     }
@@ -148,7 +149,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
       {/* Панель уведомлений */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+        <DropdownPortal position="top-right">
+          <div className="w-80 bg-white rounded-lg shadow-lg border border-gray-200">
           {/* Заголовок */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">Уведомления</h3>
@@ -156,7 +158,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                  className="text-sm text-primary-600 hover:text-primary-800 transition-colors"
                 >
                   Отметить все как прочитанные
                 </button>
@@ -183,7 +185,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                   <div
                     key={notification.id}
                     className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${
-                      !notification.isRead ? 'bg-blue-50' : ''
+                      !notification.isRead ? 'bg-primary-50' : ''
                     }`}
                     onClick={() => markAsRead(notification.id)}
                   >
@@ -199,7 +201,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                             {notification.title}
                           </h4>
                           {!notification.isRead && (
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
                           )}
                         </div>
                         <p className="text-sm text-gray-600 mt-1">
@@ -219,12 +221,13 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           {/* Футер */}
           {notifications.length > 0 && (
             <div className="p-4 border-t border-gray-200">
-              <button className="w-full text-sm text-blue-600 hover:text-blue-800 transition-colors">
+              <button className="w-full text-sm text-primary-600 hover:text-primary-800 transition-colors">
                 Показать все уведомления
               </button>
             </div>
           )}
-        </div>
+          </div>
+        </DropdownPortal>
       )}
     </div>
   )

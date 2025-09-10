@@ -4,8 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '../../../components/ui/Button'
 import { Input } from '../../../components/ui/Input'
-import { FileUpload } from '../../../components/ui/FileUpload'
-import { User, Shield, Building, UserCheck, Upload, AlertCircle, UserPlus } from 'lucide-react'
+import { User, Shield, AlertCircle, UserPlus } from 'lucide-react'
 
 
 export default function Register() {
@@ -18,13 +17,11 @@ export default function Register() {
     password: '',
     confirmPassword: '',
     role: 'client' as 'client' | 'executor',
-    legalStatus: '' as 'ИП' | 'Юр. лицо' | 'Самозанятый' | '',
     location: '',
     description: '',
     experience: '',
     hourlyRate: '',
     categories: [] as string[],
-    documents: [] as File[],
     referralCode: '' // Добавляем поле для реферального кода
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -84,13 +81,11 @@ export default function Register() {
     }
 
     if (currentStep === 2 && formData.role === 'executor') {
-      if (!formData.legalStatus) newErrors.legalStatus = 'Выберите правовой статус'
       if (!formData.description.trim()) newErrors.description = 'Описание обязательно'
       if (!formData.experience.trim()) newErrors.experience = 'Опыт работы обязателен'
       if (!formData.hourlyRate.trim()) newErrors.hourlyRate = 'Почасовая ставка обязательна'
       if (formData.categories.length === 0) newErrors.categories = 'Выберите хотя бы одну категорию'
       if (formData.categories.length > 3) newErrors.categories = 'Можно выбрать максимум 3 категории'
-      if (formData.documents.length === 0) newErrors.documents = 'Загрузите необходимые документы'
     }
 
     setErrors(newErrors)
@@ -144,9 +139,6 @@ export default function Register() {
     }
   }
 
-  const handleFileUpload = (files: File[]) => {
-    setFormData(prev => ({ ...prev, documents: files }))
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -163,7 +155,6 @@ export default function Register() {
         password: formData.password,
         role: formData.role,
         location: formData.location,
-        legalStatus: formData.legalStatus as 'ИП' | 'Юр. лицо' | 'Самозанятый',
         referralCode: formData.referralCode, // Добавляем реферальный код
         profile: formData.role === 'executor' ? {
           description: formData.description,
@@ -523,42 +514,6 @@ export default function Register() {
             {/* Шаг 2: Профессиональная информация (только для исполнителей) */}
             {step === 2 && formData.role === 'executor' && (
               <div className="space-y-6">
-                {/* Правовой статус */}
-                <div>
-                  <label className="block text-lg font-semibold text-gray-700 mb-4">
-                    Правовой статус
-                  </label>
-                  <div className="grid grid-cols-3 gap-6">
-                    {[
-                      { value: 'ИП', label: 'ИП', icon: Building, description: 'Индивидуальный предприниматель', color: 'primary' },
-                      { value: 'Юр. лицо', label: 'Юр. лицо', icon: Building, description: 'Юридическое лицо', color: 'secondary' },
-                      { value: 'Самозанятый', label: 'Самозанятый', icon: UserCheck, description: 'Самозанятый', color: 'primary' }
-                    ].map(option => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => handleInputChange('legalStatus', option.value as 'ИП' | 'Юр. лицо' | 'Самозанятый')}
-                        className={`p-6 border-2 rounded-xl text-center transition-all duration-300 transform hover:scale-105 ${
-                          formData.legalStatus === option.value
-                            ? `border-${option.color}-500 bg-gradient-to-br from-${option.color}-50 to-${option.color}-100 text-${option.color}-700 shadow-lg`
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                        }`}
-                      >
-                        <div className={`w-12 h-12 bg-gradient-to-br from-${option.color}-600 to-${option.color}-700 rounded-full flex items-center justify-center mx-auto mb-3 shadow-md`}>
-                          <option.icon className="h-6 w-6 text-white" />
-                        </div>
-                        <div className="font-semibold text-lg mb-1">{option.label}</div>
-                        <div className="text-xs text-gray-600">{option.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                  {errors.legalStatus && (
-                    <p className="text-red-500 text-sm mt-2 flex items-center">
-                      <AlertCircle className="h-4 w-4 mr-2" />
-                      {errors.legalStatus}
-                    </p>
-                  )}
-                </div>
 
                 {/* Профессиональные поля */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -664,34 +619,6 @@ export default function Register() {
                    </div>
                 </div>
 
-                {/* Загрузка документов */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Загрузка документов
-                  </label>
-                  <FileUpload
-                    label=""
-                    multiple
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    value={formData.documents}
-                    onChange={handleFileUpload}
-                    required
-                  />
-                  <p className="text-sm text-gray-500 mt-2">
-                    Загрузите документы в зависимости от вашего правового статуса:
-                  </p>
-                  <ul className="text-sm text-gray-500 mt-1 space-y-1">
-                    <li>• ИП: Свидетельство ИП, справка о регистрации</li>
-                    <li>• Юр. лицо: Свидетельство о регистрации, устав</li>
-                    <li>• Самозанятый: Справка о самозанятости</li>
-                  </ul>
-                  {errors.documents && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="h-4 w-4 mr-1" />
-                      {errors.documents}
-                    </p>
-                  )}
-                </div>
 
                 <div className="flex justify-between pt-6">
                   <Button
@@ -718,7 +645,7 @@ export default function Register() {
                       </div>
                     ) : (
                       <div className="flex items-center space-x-2">
-                        <UserCheck className="h-5 w-5" />
+                        <User className="h-5 w-5" />
                         <span>Завершить регистрацию</span>
                       </div>
                     )}
@@ -732,7 +659,7 @@ export default function Register() {
               <div className="space-y-6">
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <UserCheck className="h-8 w-8 text-primary-600" />
+                    <User className="h-8 w-8 text-primary-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     Готово к регистрации!
@@ -788,7 +715,7 @@ export default function Register() {
                       </div>
                     ) : (
                       <div className="flex items-center space-x-2">
-                        <UserCheck className="h-5 w-5" />
+                        <User className="h-5 w-5" />
                         <span>Завершить регистрацию</span>
                       </div>
                     )}

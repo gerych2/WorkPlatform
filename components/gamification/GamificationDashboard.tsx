@@ -64,14 +64,20 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
 
   const fetchGamificationData = async () => {
     try {
+      console.log('🎮 Загрузка данных геймификации для пользователя:', userId)
       const response = await fetch(`/api/gamification/stats?userId=${userId}`)
       const result = await response.json()
       
+      console.log('🎮 Ответ API геймификации:', result)
+      
       if (result.success) {
         setData(result.data)
+        console.log('🎮 Данные геймификации загружены:', result.data)
+      } else {
+        console.error('🎮 Ошибка в ответе API:', result.error)
       }
     } catch (error) {
-      console.error('Error fetching gamification data:', error)
+      console.error('🎮 Ошибка загрузки данных геймификации:', error)
     } finally {
       setLoading(false)
     }
@@ -145,8 +151,8 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg p-4 shadow-sm border border-secondary-200">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Zap className="h-6 w-6 text-blue-600" />
+            <div className="p-2 bg-primary-100 rounded-lg">
+              <Zap className="h-6 w-6 text-primary-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Сегодня</p>
@@ -157,8 +163,8 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
 
         <div className="bg-white rounded-lg p-4 shadow-sm border border-secondary-200">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Star className="h-6 w-6 text-green-600" />
+            <div className="p-2 bg-secondary-100 rounded-lg">
+              <Star className="h-6 w-6 text-secondary-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">За неделю</p>
@@ -169,8 +175,8 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
 
         <div className="bg-white rounded-lg p-4 shadow-sm border border-secondary-200">
           <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Trophy className="h-6 w-6 text-purple-600" />
+            <div className="p-2 bg-primary-100 rounded-lg">
+              <Trophy className="h-6 w-6 text-primary-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Достижения</p>
@@ -181,11 +187,11 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
 
         <div className="bg-white rounded-lg p-4 shadow-sm border border-secondary-200">
           <div className="flex items-center">
-            <div className="p-2 bg-orange-100 rounded-lg">
+            <div className="p-2 bg-secondary-100 rounded-lg">
               {data.user.role === 'executor' ? (
-                <CreditCard className="h-6 w-6 text-orange-600" />
+                <CreditCard className="h-6 w-6 text-secondary-600" />
               ) : (
-                <Users className="h-6 w-6 text-orange-600" />
+                <Users className="h-6 w-6 text-secondary-600" />
               )}
             </div>
             <div className="ml-4">
@@ -256,15 +262,15 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
                     <div className="text-sm text-gray-600">⚪ Обычные</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-500">{data.achievements.byRarity.rare}</div>
+                    <div className="text-2xl font-bold text-primary-500">{data.achievements.byRarity.rare}</div>
                     <div className="text-sm text-gray-600">🔵 Редкие</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-500">{data.achievements.byRarity.epic}</div>
+                    <div className="text-2xl font-bold text-primary-500">{data.achievements.byRarity.epic}</div>
                     <div className="text-sm text-gray-600">🟣 Эпические</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-500">{data.achievements.byRarity.legendary}</div>
+                    <div className="text-2xl font-bold text-secondary-500">{data.achievements.byRarity.legendary}</div>
                     <div className="text-sm text-gray-600">🟠 Легендарные</div>
                   </div>
                 </div>
@@ -283,8 +289,8 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
           {activeTab === 'subscription' && data.user.role === 'executor' && (
             <div className="space-y-6">
               <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Crown className="h-8 w-8 text-green-600" />
+                <div className="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Crown className="h-8 w-8 text-secondary-600" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Подписка исполнителя</h3>
                 <p className="text-gray-600 mb-6">
@@ -332,9 +338,9 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
                 </div>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-6">
-                <h4 className="font-semibold text-blue-900 mb-3">🎯 Бонусы за подписку:</h4>
-                <ul className="space-y-2 text-blue-800">
+              <div className="bg-primary-50 rounded-lg p-6">
+                <h4 className="font-semibold text-primary-900 mb-3">🎯 Бонусы за подписку:</h4>
+                <ul className="space-y-2 text-primary-800">
                   <li>• +200 XP за первую подписку</li>
                   <li>• +100 XP за каждый месяц продления</li>
                   <li>• Приоритет в поиске (+30-70%)</li>

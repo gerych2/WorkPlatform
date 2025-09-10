@@ -164,7 +164,7 @@ export default function ExecutorSubscription() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'text-green-600 bg-green-100'
+      case 'active': return 'text-secondary-600 bg-secondary-100'
       case 'expired': return 'text-red-600 bg-red-100'
       case 'cancelled': return 'text-gray-600 bg-gray-100'
       default: return 'text-gray-600 bg-gray-100'
@@ -199,38 +199,56 @@ export default function ExecutorSubscription() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Заголовок */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-primary-900 mb-2">
-            Управление подпиской
-          </h1>
-          <p className="text-gray-600">
-            Оформите подписку для доступа к заказам и развития вашего бизнеса
-          </p>
+          <div className="relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl blur opacity-20"></div>
+            <div className="relative bg-gradient-to-r from-primary-500 to-secondary-600 rounded-2xl p-8 text-white">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+              
+              <div className="relative z-10 flex items-center">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl mr-6">
+                  <Crown className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold text-white mb-2">
+                    Управление подпиской
+                  </h1>
+                  <p className="text-white/80 text-lg">
+                    Оформите подписку для доступа к заказам и развития вашего бизнеса
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Текущая подписка */}
         {activeSubscription && (
-          <div className="mb-8 p-6 bg-green-50 border border-green-200 rounded-xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <Crown className="h-6 w-6 text-green-600" />
+          <div className="mb-8 group relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl blur opacity-0 group-hover:opacity-25 transition duration-1000 group-hover:duration-200"></div>
+            <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-6 group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-gradient-to-r from-primary-100 to-secondary-100 rounded-xl group-hover:rotate-6 transition-transform duration-300">
+                    <Crown className="h-6 w-6 text-primary-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors duration-300">
+                      Активная подписка
+                    </h3>
+                    <p className="text-gray-600">
+                      {activeSubscription.planType} план • Действует до {new Date(activeSubscription.endDate).toLocaleDateString('ru-RU')}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-green-900">
-                    Активная подписка
-                  </h3>
-                  <p className="text-green-700">
-                    {activeSubscription.planType} план • Действует до {new Date(activeSubscription.endDate).toLocaleDateString('ru-RU')}
+                <div className="text-right">
+                  <span className="text-primary-600 font-bold text-2xl">
+                    {activeSubscription.amount} BYN
+                  </span>
+                  <p className="text-secondary-600 text-sm">
+                    {getStatusText(activeSubscription.status)}
                   </p>
                 </div>
-              </div>
-              <div className="text-right">
-                <span className="text-green-700 font-bold text-xl">
-                  {activeSubscription.amount} BYN
-                </span>
-                <p className="text-green-600 text-sm">
-                  {getStatusText(activeSubscription.status)}
-                </p>
               </div>
             </div>
           </div>
@@ -238,7 +256,7 @@ export default function ExecutorSubscription() {
 
         {/* История подписок */}
         {subscriptions.length > 0 && (
-          <div className="mb-8 bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+          <div className="mb-8 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               История подписок
             </h2>
@@ -280,16 +298,24 @@ export default function ExecutorSubscription() {
             Выберите план подписки
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {subscriptionPlans.map((plan) => (
               <div
                 key={plan.id}
-                className={`relative bg-white rounded-xl shadow-sm border-2 p-6 transition-all duration-200 hover:shadow-lg ${
-                  plan.popular 
-                    ? 'border-primary-500 ring-2 ring-primary-200' 
-                    : 'border-secondary-200'
-                }`}
+                className="group relative"
               >
+                {/* Glow effect */}
+                <div className={`absolute -inset-0.5 rounded-2xl blur transition duration-1000 group-hover:duration-200 ${
+                  plan.popular 
+                    ? 'bg-gradient-to-r from-primary-600 to-secondary-600 opacity-0 group-hover:opacity-25' 
+                    : 'bg-gradient-to-r from-gray-400 to-gray-600 opacity-0 group-hover:opacity-20'
+                }`}></div>
+                
+                <div className={`relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-6 transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105 ${
+                  plan.popular 
+                    ? 'ring-2 ring-primary-200' 
+                    : ''
+                }`}>
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <span className="bg-primary-600 text-white px-4 py-1 rounded-full text-sm font-medium">
@@ -298,39 +324,41 @@ export default function ExecutorSubscription() {
                   </div>
                 )}
 
-                <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    {plan.name}
-                  </h3>
-                  <div className="flex items-baseline justify-center space-x-1">
-                    <span className="text-3xl font-bold text-primary-600">
-                      {plan.price}
-                    </span>
-                    <span className="text-gray-600">BYN</span>
-                  </div>
-                  <p className="text-gray-600 text-sm mt-1">
-                    за {plan.duration}
-                  </p>
-                </div>
-
-                <div className="space-y-3 mb-6">
-                  {plan.features.map((feature, index) => (
-                    <div key={index} className="flex items-center space-x-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{feature}</span>
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors duration-300">
+                      {plan.name}
+                    </h3>
+                    <div className="flex items-baseline justify-center space-x-1 mb-2">
+                      <span className="text-4xl font-bold text-primary-600">
+                        {plan.price}
+                      </span>
+                      <span className="text-gray-600 text-lg">BYN</span>
                     </div>
-                  ))}
-                </div>
+                    <p className="text-gray-600 text-sm">
+                      за {plan.duration}
+                    </p>
+                  </div>
 
-                <Button
-                  onClick={() => handleCreateSubscription(plan.id)}
-                  disabled={isCreating || !!activeSubscription}
-                  className={`w-full ${
-                    plan.popular 
-                      ? 'bg-primary-600 hover:bg-primary-700' 
-                      : 'bg-secondary-600 hover:bg-secondary-700'
-                  }`}
-                >
+                  <div className="space-y-4 mb-6">
+                    {plan.features.map((feature, index) => (
+                      <div key={index} className="flex items-center space-x-3">
+                        <div className="p-1 bg-gradient-to-r from-primary-100 to-secondary-100 rounded-full">
+                          <CheckCircle className="h-4 w-4 text-primary-600" />
+                        </div>
+                        <span className="text-sm text-gray-700">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <Button
+                    onClick={() => handleCreateSubscription(plan.id)}
+                    disabled={isCreating || !!activeSubscription}
+                    className={`w-full group-hover:scale-105 transition-all duration-200 ${
+                      plan.popular 
+                        ? 'bg-primary-600 hover:bg-primary-700' 
+                        : 'bg-secondary-600 hover:bg-secondary-700'
+                    }`}
+                  >
                   {isCreating ? (
                     <div className="flex items-center">
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -347,14 +375,15 @@ export default function ExecutorSubscription() {
                       Оформить подписку
                     </div>
                   )}
-                </Button>
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Преимущества подписки */}
-        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
             Преимущества подписки
           </h2>
@@ -385,8 +414,8 @@ export default function ExecutorSubscription() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <DollarSign className="h-8 w-8 text-green-600" />
+              <div className="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <DollarSign className="h-8 w-8 text-secondary-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Больше заказов
@@ -397,8 +426,8 @@ export default function ExecutorSubscription() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="h-8 w-8 text-purple-600" />
+              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-8 w-8 text-primary-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Поддержка

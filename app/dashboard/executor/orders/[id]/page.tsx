@@ -230,6 +230,18 @@ export default function ExecutorOrderDetails() {
   const handleSubmitReview = async () => {
     if (!currentUser || !order || !order.client) return
 
+    const reviewPayload = {
+      orderId: order.id,
+      clientId: order.client.id,
+      executorId: currentUser.id,
+      reviewerId: currentUser.id, // Исполнитель оставляет отзыв
+      reviewedId: order.client.id, // На клиента
+      rating: reviewData.rating,
+      comment: reviewData.comment || ''
+    }
+
+    console.log('Исполнитель отправляет отзыв:', reviewPayload)
+
     try {
       const response = await fetch('/api/reviews', {
         method: 'POST',
@@ -237,13 +249,7 @@ export default function ExecutorOrderDetails() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${safeBase64Encode(JSON.stringify(currentUser))}`
         },
-        body: JSON.stringify({
-          orderId: order.id,
-          clientId: order.client.id,
-          executorId: currentUser.id,
-          rating: reviewData.rating,
-          comment: reviewData.comment
-        })
+        body: JSON.stringify(reviewPayload)
       })
 
       if (response.ok) {
@@ -679,7 +685,7 @@ export default function ExecutorOrderDetails() {
 
       {/* Модальное окно для отзыва */}
       {showReviewModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-modal">
           <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
             <h3 className="text-xl font-semibold mb-4">Оставить отзыв о клиенте</h3>
             

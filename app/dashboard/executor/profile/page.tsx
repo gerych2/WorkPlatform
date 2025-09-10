@@ -297,20 +297,34 @@ export default function ExecutorProfile() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Заголовок */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-primary-900 mb-2">
-            Мой профиль
-          </h1>
-          <p className="text-gray-600">
-            Управляйте информацией о своих услугах и настройте профиль
-          </p>
-          
+          <div className="relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl blur opacity-20"></div>
+            <div className="relative bg-gradient-to-r from-primary-500 to-secondary-600 rounded-2xl p-8 text-white">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+              
+              <div className="relative z-10 flex items-center">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl mr-6">
+                  <Briefcase className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold text-white mb-2">
+                    Мой профиль
+                  </h1>
+                  <p className="text-white/80 text-lg">
+                    Управляйте информацией о своих услугах и настройте профиль
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Основная информация */}
           <div className="lg:col-span-2 space-y-8">
             {/* Личная информация */}
-            <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 flex items-center">
                   <User className="h-5 w-5 mr-2 text-primary-600" />
@@ -320,7 +334,7 @@ export default function ExecutorProfile() {
                   <Button
                     onClick={() => setIsEditing(true)}
                     variant="outline"
-                    className="flex items-center"
+                    className="flex items-center hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
                   >
                     <Edit3 className="h-4 w-4 mr-2" />
                     Редактировать
@@ -360,7 +374,7 @@ export default function ExecutorProfile() {
             </div>
 
             {/* Профессиональная информация */}
-            <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8">
               <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
                 <Briefcase className="h-5 w-5 mr-2 text-primary-600" />
                 Профессиональная информация
@@ -378,7 +392,7 @@ export default function ExecutorProfile() {
                       rows={4}
                       className={`w-full px-4 py-3 border-2 rounded-xl transition-all duration-200 ${
                         errors.description 
-                          ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' 
+                          ? 'border-secondary-500 focus:border-secondary-500 focus:ring-2 focus:ring-red-200' 
                           : 'border-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'
                       }`}
                       placeholder="Расскажите о себе и своих услугах..."
@@ -388,7 +402,7 @@ export default function ExecutorProfile() {
                       {executorProfile?.description || 'Не указано'}
                     </p>
                   )}
-                  {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+                  {errors.description && <p className="text-secondary-500 text-sm mt-1">{errors.description}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -402,14 +416,14 @@ export default function ExecutorProfile() {
                         value={formData.experience}
                         onChange={(e) => handleInputChange('experience', e.target.value)}
                         placeholder="5 лет"
-                        className={errors.experience ? 'border-red-500' : ''}
+                        className={errors.experience ? 'border-secondary-500' : ''}
                       />
                     ) : (
                       <p className="text-gray-900 py-2">
                         {executorProfile?.experience || 'Не указано'}
                       </p>
                     )}
-                    {errors.experience && <p className="text-red-500 text-sm mt-1">{errors.experience}</p>}
+                    {errors.experience && <p className="text-secondary-500 text-sm mt-1">{errors.experience}</p>}
                   </div>
 
                   <div>
@@ -424,14 +438,14 @@ export default function ExecutorProfile() {
                         placeholder="50"
                         min="0"
                         step="0.01"
-                        className={errors.hourlyRate ? 'border-red-500' : ''}
+                        className={errors.hourlyRate ? 'border-secondary-500' : ''}
                       />
                     ) : (
                       <p className="text-gray-900 py-2">
                         {executorProfile?.hourlyRate ? `${executorProfile.hourlyRate} BYN/час` : 'Не указана'}
                       </p>
                     )}
-                    {errors.hourlyRate && <p className="text-red-500 text-sm mt-1">{errors.hourlyRate}</p>}
+                    {errors.hourlyRate && <p className="text-secondary-500 text-sm mt-1">{errors.hourlyRate}</p>}
                   </div>
                 </div>
 
@@ -491,7 +505,7 @@ export default function ExecutorProfile() {
                       ))}
                     </div>
                   )}
-                  {errors.categories && <p className="text-red-500 text-sm mt-1">{errors.categories}</p>}
+                  {errors.categories && <p className="text-secondary-500 text-sm mt-1">{errors.categories}</p>}
                 </div>
               </div>
 
@@ -512,6 +526,7 @@ export default function ExecutorProfile() {
                   <Button
                     onClick={handleCancel}
                     variant="outline"
+                    className="hover:bg-secondary-50 hover:border-secondary-300 transition-all duration-200"
                   >
                     Отмена
                   </Button>
@@ -523,7 +538,7 @@ export default function ExecutorProfile() {
           {/* Боковая панель */}
           <div className="space-y-8">
             {/* Статистика */}
-            <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <Award className="h-5 w-5 mr-2 text-primary-600" />
                 Статистика
@@ -533,7 +548,7 @@ export default function ExecutorProfile() {
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Рейтинг</span>
                   <div className="flex items-center">
-                    <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                    <Star className="h-4 w-4 text-secondary-400 mr-1" />
                     <span className="font-semibold">
                       {executorProfile?.rating ? Number(executorProfile.rating).toFixed(1) : '0.0'}
                     </span>
@@ -558,7 +573,7 @@ export default function ExecutorProfile() {
             </div>
 
             {/* Статус верификации */}
-            <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <CheckCircle className="h-5 w-5 mr-2 text-primary-600" />
                 Верификация
@@ -569,16 +584,16 @@ export default function ExecutorProfile() {
                   <span className="text-gray-600">Статус</span>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     executorProfile?.isVerified 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-secondary-100 text-secondary-800' 
+                      : 'bg-secondary-100 text-secondary-800'
                   }`}>
                     {executorProfile?.isVerified ? 'Верифицирован' : 'На проверке'}
                   </span>
                 </div>
 
                 {!executorProfile?.isVerified && (
-                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-sm text-yellow-800">
+                  <div className="mt-4 p-3 bg-secondary-50 border border-secondary-200 rounded-lg">
+                    <p className="text-sm text-secondary-800">
                       Ваш профиль находится на проверке. После верификации вы сможете получать больше заказов.
                     </p>
                   </div>
@@ -586,33 +601,11 @@ export default function ExecutorProfile() {
               </div>
             </div>
 
-            {/* Документы */}
-            <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Upload className="h-5 w-5 mr-2 text-primary-600" />
-                Документы
-              </h3>
-
-              <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Загрузить паспорт
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Загрузить справку
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Загрузить фото
-                </Button>
-              </div>
-            </div>
 
             {/* Отзывы о исполнителе */}
-            <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Star className="h-5 w-5 mr-2 text-yellow-500" />
+                <Star className="h-5 w-5 mr-2 text-secondary-500" />
                 Отзывы о вас
               </h3>
               {isLoadingReviews ? (
@@ -623,7 +616,7 @@ export default function ExecutorProfile() {
               ) : reviews.length > 0 ? (
                 <div className="space-y-4">
                   {(showAllReviews ? reviews : reviews.slice(0, 3)).map((review) => (
-                    <div key={review.id} className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                    <div key={review.id} className="bg-gradient-to-r from-secondary-50 to-secondary-50 border border-secondary-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center flex-1 min-w-0">
                           <div className="flex items-center mr-3">
@@ -631,7 +624,7 @@ export default function ExecutorProfile() {
                               <Star
                                 key={i}
                                 className={`h-4 w-4 ${
-                                  i < review.rating ? 'text-yellow-400' : 'text-gray-300'
+                                  i < review.rating ? 'text-secondary-400' : 'text-gray-300'
                                 }`}
                                 fill={i < review.rating ? 'currentColor' : 'none'}
                               />
@@ -651,7 +644,7 @@ export default function ExecutorProfile() {
                         </span>
                       </div>
                       {review.comment && (
-                        <div className="bg-white rounded-md p-3 border border-yellow-100">
+                        <div className="bg-white rounded-md p-3 border border-secondary-100">
                           <p className="text-gray-800 text-sm leading-relaxed italic break-words">
                             "{review.comment}"
                           </p>

@@ -50,7 +50,6 @@ async function deleteAndCreateExecutor() {
         location: 'Минск',
         isVerified: true,
         verificationStatus: 'verified',
-        legalStatus: 'individual',
         clientRating: 0,
         clientReviewsCount: 0
       }

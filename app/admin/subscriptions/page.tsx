@@ -156,10 +156,10 @@ export default function SubscriptionManagement() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'text-green-600 bg-green-100'
+      case 'active': return 'text-secondary-600 bg-secondary-100'
       case 'expired': return 'text-red-600 bg-red-100'
       case 'cancelled': return 'text-gray-600 bg-gray-100'
-      case 'pending': return 'text-yellow-600 bg-yellow-100'
+      case 'pending': return 'text-secondary-600 bg-secondary-100'
       default: return 'text-gray-600 bg-gray-100'
     }
   }
@@ -203,8 +203,8 @@ export default function SubscriptionManagement() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-green-100">
-                <CheckCircle className="h-6 w-6 text-green-600" />
+              <div className="p-2 rounded-lg bg-secondary-100">
+                <CheckCircle className="h-6 w-6 text-secondary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Активные</p>
@@ -231,8 +231,8 @@ export default function SubscriptionManagement() {
           
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-yellow-100">
-                <Clock className="h-6 w-6 text-yellow-600" />
+              <div className="p-2 rounded-lg bg-secondary-100">
+                <Clock className="h-6 w-6 text-secondary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Ожидают</p>
@@ -245,8 +245,8 @@ export default function SubscriptionManagement() {
           
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-blue-100">
-                <CreditCard className="h-6 w-6 text-blue-600" />
+              <div className="p-2 rounded-lg bg-primary-100">
+                <CreditCard className="h-6 w-6 text-primary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Общая выручка</p>
@@ -485,7 +485,7 @@ export default function SubscriptionManagement() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {subscription.plan ? (
                         <div className="flex items-center">
-                          <Crown className="h-4 w-4 text-yellow-500 mr-2" />
+                          <Crown className="h-4 w-4 text-secondary-500 mr-2" />
                           <span className="text-sm text-gray-900 capitalize">
                             {subscription.plan || 'Не указан'}
                           </span>
@@ -515,7 +515,7 @@ export default function SubscriptionManagement() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {subscription.autoRenew === true ? (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <CheckCircle className="h-5 w-5 text-secondary-500" />
                       ) : (
                         <XCircle className="h-5 w-5 text-red-500" />
                       )}

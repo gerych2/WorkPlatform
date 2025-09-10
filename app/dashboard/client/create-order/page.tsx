@@ -338,7 +338,7 @@ export default function CreateOrder() {
                       serviceDescription: ''
                     }))
                   }}
-                  className="text-sm text-blue-600 hover:text-blue-800 underline"
+                  className="text-sm text-primary-600 hover:text-primary-800 underline"
                 >
                   Переключиться на обычный заказ
                 </button>
@@ -401,26 +401,26 @@ export default function CreateOrder() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Информация о выбранном исполнителе для прямого бронирования */}
           {orderType === 'direct' && selectedExecutor && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-blue-900 mb-4 flex items-center">
+            <div className="bg-primary-50 border border-primary-200 rounded-xl p-6">
+              <h2 className="text-xl font-semibold text-primary-900 mb-4 flex items-center">
                 <User className="h-5 w-5 mr-2" />
                 Выбранный исполнитель
               </h2>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 font-semibold text-lg">
+                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                  <span className="text-primary-600 font-semibold text-lg">
                     {selectedExecutor.name.charAt(0)}
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-medium text-blue-900">{selectedExecutor.name}</h3>
-                  <p className="text-sm text-blue-700">
+                  <h3 className="font-medium text-primary-900">{selectedExecutor.name}</h3>
+                  <p className="text-sm text-primary-700">
                     {selectedExecutor.executorProfile?.experience || 'Опыт не указан'}
                   </p>
                   {selectedExecutor.executorProfile?.rating && (
                     <div className="flex items-center mt-1">
-                      <span className="text-yellow-500">★</span>
-                      <span className="ml-1 text-sm text-blue-600">
+                      <span className="text-secondary-500">★</span>
+                      <span className="ml-1 text-sm text-primary-600">
                         {selectedExecutor.executorProfile.rating.toFixed(1)}
                       </span>
                     </div>
@@ -586,7 +586,7 @@ export default function CreateOrder() {
                 />
                 {orderType === 'direct' && localStorage.getItem('selectedDateTime') && (
                   <div className="mt-1">
-                    <p className="text-sm text-blue-600 flex items-center">
+                    <p className="text-sm text-primary-600 flex items-center">
                       <CheckCircle className="h-4 w-4 mr-1" />
                       Время выбрано в календаре исполнителя
                     </p>
@@ -613,7 +613,7 @@ export default function CreateOrder() {
                           serviceDescription: ''
                         }))
                       }}
-                      className="text-sm text-blue-600 hover:text-blue-800 underline mt-1"
+                      className="text-sm text-primary-600 hover:text-primary-800 underline mt-1"
                     >
                       Создать обычный заказ вместо прямого бронирования
                     </button>
@@ -642,7 +642,7 @@ export default function CreateOrder() {
                 />
                 {orderType === 'direct' && localStorage.getItem('selectedDateTime') && (
                   <div className="mt-1">
-                    <p className="text-sm text-blue-600 flex items-center">
+                    <p className="text-sm text-primary-600 flex items-center">
                       <CheckCircle className="h-4 w-4 mr-1" />
                       Время выбрано в календаре исполнителя
                     </p>
@@ -656,11 +656,11 @@ export default function CreateOrder() {
               {/* Кнопка для переключения типа заказа */}
               {orderType === 'direct' && localStorage.getItem('selectedDateTime') && (
                 <div className="md:col-span-3">
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="bg-secondary-50 border border-secondary-200 rounded-lg p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="font-medium text-yellow-900">Время заблокировано</h4>
-                        <p className="text-sm text-yellow-700 mt-1">
+                        <h4 className="font-medium text-secondary-900">Время заблокировано</h4>
+                        <p className="text-sm text-secondary-700 mt-1">
                           Время было выбрано в календаре исполнителя. Если хотите создать обычный заказ, нажмите кнопку ниже.
                         </p>
                       </div>

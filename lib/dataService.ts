@@ -12,7 +12,6 @@ export interface User {
   lastLogin: string
   location: string
   isVerified: boolean
-  legalStatus?: 'ИП' | 'Юр. лицо' | 'Самозанятый'
   documents?: Document[]
   profile?: {
     description?: string
@@ -58,7 +57,6 @@ export interface Document {
   id: string
   executorId: string
   executorName: string
-  legalStatus: 'ИП' | 'Юр. лицо' | 'Самозанятый'
   documentType: string
   fileName: string
   fileUrl?: string
@@ -246,7 +244,6 @@ const initializeDefaultData = () => {
         lastLogin: getCurrentDate(),
         location: 'Минск',
         isVerified: true,
-        legalStatus: 'ИП',
         profile: {
           description: 'Опытный электрик с 10-летним стажем',
           experience: '10 лет',

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Bell, User, Menu, X } from 'lucide-react'
+import { Bell, User, Menu, X, Rocket } from 'lucide-react'
 import { Buffer } from 'buffer'
 import { NotificationCenter } from '../gamification/NotificationCenter'
+import { NotificationPortal } from '../ui/NotificationPortal'
+import { DropdownPortal } from '../ui/DropdownPortal'
 
 interface HeaderProps {
   userRole?: 'client' | 'executor' | 'admin'
@@ -129,39 +131,62 @@ export const Header: React.FC<HeaderProps> = ({
 
 
   return (
-    <header className="header-bg shadow-sm border-b border-primary-500">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+          <header className="relative bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 shadow-2xl border-b border-white/20 backdrop-blur-sm">
+            {/* Анимированный фон */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary-600/90 via-primary-700/90 to-primary-800/90"></div>
+      <div className="absolute inset-0 opacity-30" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+      }}></div>
+      
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
           {/* Логотип и навигация */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-secondary-600 rounded-lg flex items-center justify-center">
-                <span className="text-gray-900 font-bold text-lg">P</span>
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className="relative">
+                     <div className="w-12 h-12 bg-gradient-to-br from-white to-primary-100 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                       <span className="text-primary-600 font-bold text-xl">P</span>
+                     </div>
+                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-secondary-400 to-primary-400 rounded-full animate-pulse"></div>
               </div>
-              <span className="text-xl font-bold text-white">ProDoAgency</span>
+              <div className="flex flex-col">
+                <span className="text-2xl font-bold text-white group-hover:text-primary-100 transition-colors duration-300">ProDoAgency</span>
+                <span className="text-xs text-white/70 font-medium">Ваш успех - наша цель</span>
+              </div>
             </Link>
             
             {/* Десктопная навигация */}
-            <nav className="hidden md:flex ml-10 space-x-8">
+            <nav className="hidden md:flex ml-12 space-x-2">
               <Link 
                 href={`/dashboard/${currentUserRole}`}
-                className="text-white hover:text-secondary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                className="relative text-white/90 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/10 hover:backdrop-blur-sm group"
               >
-                Главная
+                <span className="relative z-10">Главная</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </Link>
+              <Link 
+                href="/startups" 
+                className="relative text-white/90 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/10 hover:backdrop-blur-sm group flex items-center"
+              >
+                <Rocket className="h-4 w-4 mr-2 group-hover:animate-bounce" />
+                <span className="relative z-10">Стартапы</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
               {currentUserRole === 'client' && (
                 <>
                   <Link 
                     href="/dashboard/client/search" 
-                    className="text-white hover:text-secondary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                    className="relative text-white/90 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/10 hover:backdrop-blur-sm group"
                   >
-                    Найти мастера
+                    <span className="relative z-10">Найти мастера</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </Link>
                   <Link 
                     href="/dashboard/client/orders" 
-                    className="text-white hover:text-secondary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                    className="relative text-white/90 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/10 hover:backdrop-blur-sm group"
                   >
-                    Мои заказы
+                    <span className="relative z-10">Мои заказы</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </Link>
                 </>
               )}
@@ -169,31 +194,32 @@ export const Header: React.FC<HeaderProps> = ({
                 <>
                   <Link 
                     href="/dashboard/executor/calendar" 
-                    className="text-white hover:text-secondary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                    className="relative text-white/90 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/10 hover:backdrop-blur-sm group"
                   >
-                    Календарь
+                    <span className="relative z-10">Календарь</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </Link>
                   <Link 
                     href="/dashboard/executor/orders" 
-                    className="text-white hover:text-secondary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                    className="relative text-white/90 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/10 hover:backdrop-blur-sm group"
                   >
-                    Заказы
+                    <span className="relative z-10">Заказы</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </Link>
                   <Link 
                     href="/dashboard/executor/subscription" 
-                    className="text-white hover:text-secondary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                    className="relative text-white/90 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/10 hover:backdrop-blur-sm group"
                   >
-                    Подписка
+                    <span className="relative z-10">Подписка</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </Link>
                 </>
               )}
             </nav>
           </div>
 
-          {/* Правая часть - поиск, уведомления, профиль */}
-          <div className="flex items-center space-x-4">
-
-
+          {/* Правая часть - уведомления, профиль */}
+          <div className="flex items-center space-x-3">
             {/* Уведомления */}
             <div className="relative">
               {currentUser ? (
@@ -201,21 +227,27 @@ export const Header: React.FC<HeaderProps> = ({
               ) : (
                 <button
                   onClick={toggleNotifications}
-                  className="p-2 rounded-full text-white hover:text-secondary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600 transition-colors duration-200"
+                  className="relative p-3 rounded-2xl text-white/90 hover:text-white hover:bg-white/10 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 group"
                 >
-                  <Bell className="h-6 w-6" />
+                  <Bell className="h-6 w-6 group-hover:animate-pulse" />
                   {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 text-xs font-bold text-white animate-pulse">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
                   )}
                 </button>
               )}
 
               {/* Выпадающее меню уведомлений */}
               {isNotificationsOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
-                  <div className="py-1">
-                    <div className="px-4 py-2 border-b border-secondary-200">
-                      <h3 className="text-sm font-medium text-gray-900">Уведомления</h3>
+                <DropdownPortal position="top-right">
+                  <div className="w-96 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl ring-1 ring-white/20 border border-white/30">
+                  <div className="py-2">
+                    <div className="px-6 py-3 border-b border-gray-100/50">
+                      <h3 className="text-lg font-bold text-gray-900 flex items-center">
+                        <Bell className="h-5 w-5 mr-2 text-primary-600" />
+                        Уведомления
+                      </h3>
                     </div>
                     {notifications.length > 0 ? (
                       <div className="max-h-64 overflow-y-auto">
@@ -223,7 +255,7 @@ export const Header: React.FC<HeaderProps> = ({
                           <div 
                             key={notification.id} 
                             className={`px-4 py-3 hover:bg-secondary-50 border-b border-gray-100 last:border-b-0 ${
-                              !notification.isRead ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                              !notification.isRead ? 'bg-primary-50 border-l-4 border-l-primary-500' : ''
                             }`}
                           >
                             <div className="flex items-start justify-between">
@@ -241,7 +273,7 @@ export const Header: React.FC<HeaderProps> = ({
                                 </p>
                               </div>
                               {!notification.isRead && (
-                                <div className="ml-2 w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></div>
+                                <div className="ml-2 w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1"></div>
                               )}
                             </div>
                           </div>
@@ -253,7 +285,8 @@ export const Header: React.FC<HeaderProps> = ({
                       </div>
                     )}
                   </div>
-                </div>
+                  </div>
+                </DropdownPortal>
               )}
             </div>
 
@@ -261,48 +294,81 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="relative">
               <button
                 onClick={toggleProfile}
-                className="flex items-center space-x-2 p-2 rounded-full text-white hover:text-secondary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-600 transition-colors duration-200"
+                className="flex items-center space-x-3 p-2 rounded-2xl text-white/90 hover:text-white hover:bg-white/10 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 group"
               >
-                <div className="w-8 h-8 bg-secondary-600 rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-gray-900" />
+                <div className="relative">
+                  <div className="w-10 h-10 bg-gradient-to-br from-white to-primary-100 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                    <User className="h-5 w-5 text-primary-600" />
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gradient-to-r from-secondary-400 to-primary-400 rounded-full border-2 border-white"></div>
                 </div>
-                <span className="hidden md:block text-sm font-medium text-white">
-                  {currentUserName}
-                </span>
+                <div className="hidden md:block text-left">
+                  <span className="text-sm font-semibold text-white block">
+                    {currentUserName}
+                  </span>
+                  <span className="text-xs text-white/70 capitalize">
+                    {currentUserRole === 'client' ? 'Клиент' : currentUserRole === 'executor' ? 'Исполнитель' : 'Администратор'}
+                  </span>
+                </div>
               </button>
 
               {/* Выпадающее меню профиля */}
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
-                  <div className="py-1">
-                    <Link
-                      href={currentUserRole === 'client' ? '/dashboard/client/profile' : '/dashboard/executor/profile'}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-secondary-50"
-                    >
-                      Профиль
-                    </Link>
-                    <Link
-                      href={currentUserRole === 'client' ? '/dashboard/client/settings' : '/dashboard/executor/settings'}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-secondary-50"
-                    >
-                      Настройки
-                    </Link>
-                    <hr className="my-1" />
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-secondary-50"
-                    >
-                      Выйти
-                    </button>
+                <DropdownPortal position="top-right">
+                  <div className="w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl ring-1 ring-white/20 border border-white/30">
+                  <div className="py-2">
+                    <div className="px-4 py-3 border-b border-gray-100/50">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-xl flex items-center justify-center">
+                          <User className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">{currentUserName}</p>
+                          <p className="text-xs text-gray-500 capitalize">
+                            {currentUserRole === 'client' ? 'Клиент' : currentUserRole === 'executor' ? 'Исполнитель' : 'Администратор'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="py-1">
+                      <Link
+                        href={currentUserRole === 'client' ? '/dashboard/client/profile' : '/dashboard/executor/profile'}
+                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition-colors duration-200"
+                      >
+                        <User className="h-4 w-4 mr-3 text-primary-500" />
+                        Профиль
+                      </Link>
+                      <Link
+                        href={currentUserRole === 'client' ? '/dashboard/client/settings' : '/dashboard/executor/settings'}
+                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition-colors duration-200"
+                      >
+                        <svg className="h-4 w-4 mr-3 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Настройки
+                      </Link>
+                      <hr className="my-2 border-gray-100" />
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
+                      >
+                        <svg className="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Выйти
+                      </button>
+                    </div>
                   </div>
-                </div>
+                  </div>
+                </DropdownPortal>
               )}
             </div>
 
             {/* Мобильное меню */}
             <button
               onClick={toggleMobileMenu}
-              className="md:hidden p-2 rounded-md text-white hover:text-secondary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-secondary-600 transition-colors duration-200"
+              className="md:hidden p-3 rounded-2xl text-white/90 hover:text-white hover:bg-white/10 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300"
             >
               {isMobileMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -315,26 +381,34 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Мобильное меню */}
         {isMobileMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-primary-500">
+          <NotificationPortal>
+            <div className="md:hidden fixed inset-0 top-20 bg-gradient-to-b from-primary-600/95 to-primary-800/95 backdrop-blur-xl z-maximum">
+              <div className="px-4 pt-4 pb-6 space-y-2">
 
               <Link
                 href={`/dashboard/${currentUserRole}`}
-                className="text-white hover:text-secondary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                className="text-white/90 hover:text-white block px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-white/10 backdrop-blur-sm"
               >
                 Главная
+              </Link>
+              <Link
+                href="/startups"
+                className="text-white/90 hover:text-white block px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-white/10 backdrop-blur-sm flex items-center"
+              >
+                <Rocket className="h-5 w-5 mr-3" />
+                Стартапы
               </Link>
               {currentUserRole === 'client' && (
                 <>
                   <Link
                     href="/dashboard/client/search"
-                    className="text-white hover:text-secondary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                    className="text-white/90 hover:text-white block px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-white/10 backdrop-blur-sm"
                   >
                     Найти мастера
                   </Link>
                   <Link
                     href="/dashboard/client/orders"
-                    className="text-white hover:text-secondary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                    className="text-white/90 hover:text-white block px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-white/10 backdrop-blur-sm"
                   >
                     Мои заказы
                   </Link>
@@ -344,26 +418,27 @@ export const Header: React.FC<HeaderProps> = ({
                 <>
                   <Link
                     href="/dashboard/executor/calendar"
-                    className="text-white hover:text-secondary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                    className="text-white/90 hover:text-white block px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-white/10 backdrop-blur-sm"
                   >
                     Календарь
                   </Link>
                   <Link
                     href="/dashboard/executor/orders"
-                    className="text-white hover:text-secondary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                    className="text-white/90 hover:text-white block px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-white/10 backdrop-blur-sm"
                   >
                     Заказы
                   </Link>
                   <Link
                     href="/dashboard/executor/subscription"
-                    className="text-white hover:text-secondary-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                    className="text-white/90 hover:text-white block px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-white/10 backdrop-blur-sm"
                   >
                     Подписка
                   </Link>
                 </>
               )}
+              </div>
             </div>
-          </div>
+          </NotificationPortal>
         )}
       </div>
     </header>

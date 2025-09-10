@@ -35,7 +35,6 @@ export default function ClientProfile() {
     email: '',
     phone: '',
     location: '',
-    legalStatus: 'individual'
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -55,7 +54,6 @@ export default function ClientProfile() {
               email: user.email || '',
               phone: user.phone || '',
               location: user.location || '',
-              legalStatus: user.legalStatus || 'individual'
             })
             return user
           }
@@ -95,7 +93,6 @@ export default function ClientProfile() {
           email: updatedUser.email || '',
           phone: updatedUser.phone || '',
           location: updatedUser.location || '',
-          legalStatus: updatedUser.legalStatus || 'individual'
         })
         localStorage.setItem('currentUser', JSON.stringify(updatedUser))
       }
@@ -188,7 +185,6 @@ export default function ClientProfile() {
       email: currentUser.email || '',
       phone: currentUser.phone || '',
       location: currentUser.location || '',
-      legalStatus: currentUser.legalStatus || 'individual'
     })
     setErrors({})
     setIsEditing(false)
@@ -222,36 +218,51 @@ export default function ClientProfile() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Заголовок */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-primary-900 mb-2">
-            Мой профиль
-          </h1>
-          <p className="text-gray-600">
-            Управляйте информацией о своем аккаунте
-          </p>
-          
-          {/* Рейтинг клиента */}
-          {currentUser.clientRating && Number(currentUser.clientRating) > 0 && (
-            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <div className="flex items-center">
-                <div className="flex items-center">
-                  <span className="text-yellow-500 text-xl mr-2">★</span>
-                  <span className="text-lg font-semibold text-yellow-800">
-                    {Number(currentUser.clientRating).toFixed(1)}
-                  </span>
-                  <span className="text-yellow-600 ml-2">
-                    ({currentUser.clientReviewsCount || 0} отзывов)
-                  </span>
+          <div className="relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl blur opacity-20"></div>
+            <div className="relative bg-gradient-to-r from-primary-500 to-secondary-600 rounded-2xl p-8 text-white">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+              
+              <div className="relative z-10 flex items-center">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl mr-6">
+                  <User className="h-8 w-8 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h1 className="text-4xl font-bold text-white mb-2">
+                    Мой профиль
+                  </h1>
+                  <p className="text-white/80 text-lg">
+                    Управляйте информацией о своем аккаунте
+                  </p>
+                  
+                  {/* Рейтинг клиента */}
+                  {currentUser.clientRating && Number(currentUser.clientRating) > 0 && (
+                    <div className="mt-4 p-4 bg-white/20 backdrop-blur-sm rounded-xl">
+                      <div className="flex items-center">
+                        <div className="flex items-center">
+                          <Star className="h-6 w-6 text-yellow-300 mr-2" />
+                          <span className="text-2xl font-bold text-white">
+                            {Number(currentUser.clientRating).toFixed(1)}
+                          </span>
+                          <span className="text-white/80 ml-2 text-lg">
+                            ({currentUser.clientReviewsCount || 0} отзывов)
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-white/80 text-sm mt-1">
+                        Ваш рейтинг как клиента
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
-              <p className="text-sm text-yellow-700 mt-1">
-                Ваш рейтинг как клиента
-              </p>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Основная информация */}
-        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8 mb-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900 flex items-center">
               <User className="h-5 w-5 mr-2 text-primary-600" />
@@ -261,7 +272,7 @@ export default function ClientProfile() {
               <Button
                 onClick={() => setIsEditing(true)}
                 variant="outline"
-                className="flex items-center"
+                className="flex items-center hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
               >
                 <Edit3 className="h-4 w-4 mr-2" />
                 Редактировать
@@ -279,12 +290,12 @@ export default function ClientProfile() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className={errors.name ? 'border-red-500' : ''}
+                  className={errors.name ? 'border-secondary-500 focus:border-secondary-500 focus:ring-secondary-500' : 'focus:border-primary-500 focus:ring-primary-500'}
                 />
               ) : (
                 <p className="text-gray-900 py-2">{currentUser.name || 'Не указано'}</p>
               )}
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              {errors.name && <p className="text-secondary-500 text-sm mt-1">{errors.name}</p>}
             </div>
 
             <div>
@@ -296,12 +307,12 @@ export default function ClientProfile() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  className={errors.email ? 'border-red-500' : ''}
+                  className={errors.email ? 'border-secondary-500 focus:border-secondary-500 focus:ring-secondary-500' : 'focus:border-primary-500 focus:ring-primary-500'}
                 />
               ) : (
                 <p className="text-gray-900 py-2">{currentUser.email || 'Не указано'}</p>
               )}
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-secondary-500 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div>
@@ -313,12 +324,12 @@ export default function ClientProfile() {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
-                  className={errors.phone ? 'border-red-500' : ''}
+                  className={errors.phone ? 'border-secondary-500 focus:border-secondary-500 focus:ring-secondary-500' : 'focus:border-primary-500 focus:ring-primary-500'}
                 />
               ) : (
                 <p className="text-gray-900 py-2">{currentUser.phone || 'Не указано'}</p>
               )}
-              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+              {errors.phone && <p className="text-secondary-500 text-sm mt-1">{errors.phone}</p>}
             </div>
 
             <div>
@@ -330,41 +341,22 @@ export default function ClientProfile() {
                   type="text"
                   value={formData.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
-                  className={errors.location ? 'border-red-500' : ''}
+                  className={errors.location ? 'border-secondary-500 focus:border-secondary-500 focus:ring-secondary-500' : 'focus:border-primary-500 focus:ring-primary-500'}
                 />
               ) : (
                 <p className="text-gray-900 py-2">{currentUser.location || 'Не указано'}</p>
               )}
-              {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
+              {errors.location && <p className="text-secondary-500 text-sm mt-1">{errors.location}</p>}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Правовой статус
-              </label>
-              {isEditing ? (
-                <select
-                  value={formData.legalStatus}
-                  onChange={(e) => handleInputChange('legalStatus', e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-secondary-300 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all duration-200"
-                >
-                  <option value="individual">Частное лицо</option>
-                  <option value="legal">Юридическое лицо</option>
-                </select>
-              ) : (
-                <p className="text-gray-900 py-2">
-                  {currentUser.legalStatus === 'legal' ? 'Юридическое лицо' : 'Частное лицо'}
-                </p>
-              )}
-            </div>
           </div>
 
           {isEditing && (
-            <div className="flex space-x-3 mt-6 pt-6 border-t border-secondary-200">
+            <div className="flex space-x-3 mt-6 pt-6 border-t border-gray-200">
               <Button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex items-center"
+                className="flex items-center hover:bg-primary-600 transition-all duration-200"
               >
                 {isSaving ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -376,6 +368,7 @@ export default function ClientProfile() {
               <Button
                 onClick={handleCancel}
                 variant="outline"
+                className="hover:bg-secondary-50 hover:border-secondary-300 transition-all duration-200"
               >
                 Отмена
               </Button>
@@ -384,7 +377,7 @@ export default function ClientProfile() {
         </div>
 
         {/* Статистика аккаунта */}
-        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8 mb-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8 mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
             <CheckCircle className="h-5 w-5 mr-2 text-primary-600" />
             Статистика аккаунта
@@ -405,8 +398,8 @@ export default function ClientProfile() {
               <p className="text-sm text-gray-600">Дата регистрации</p>
             </div>
 
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600 mb-1">
+            <div className="text-center p-4 bg-secondary-50 rounded-lg">
+              <div className="text-2xl font-bold text-secondary-600 mb-1">
                 {currentUser.status === 'active' ? 'Активен' : 'Неактивен'}
               </div>
               <p className="text-sm text-gray-600">Статус аккаунта</p>
@@ -415,7 +408,7 @@ export default function ClientProfile() {
         </div>
 
         {/* Дополнительная информация */}
-        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
             <AlertCircle className="h-5 w-5 mr-2 text-primary-600" />
             Дополнительная информация
@@ -426,8 +419,8 @@ export default function ClientProfile() {
               <span className="text-gray-600">Верификация</span>
               <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                 currentUser.isVerified 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-yellow-100 text-yellow-800'
+                  ? 'bg-secondary-100 text-secondary-800' 
+                  : 'bg-secondary-100 text-secondary-800'
               }`}>
                 {currentUser.isVerified ? 'Верифицирован' : 'Не верифицирован'}
               </span>
@@ -453,9 +446,9 @@ export default function ClientProfile() {
         </div>
 
         {/* Отзывы о клиенте */}
-        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8">
           <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6">
-            <Star className="h-5 w-5 mr-2 text-yellow-500" />
+            <Star className="h-5 w-5 mr-2 text-secondary-500" />
             Отзывы о вас
           </h2>
 
@@ -467,7 +460,7 @@ export default function ClientProfile() {
           ) : reviews.length > 0 ? (
             <div className="space-y-4">
               {(showAllReviews ? reviews : reviews.slice(0, 3)).map((review) => (
-                <div key={review.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                <div key={review.id} className="bg-gradient-to-r from-primary-50 to-indigo-50 border border-primary-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center flex-1 min-w-0">
                       <div className="flex items-center mr-3">
@@ -475,7 +468,7 @@ export default function ClientProfile() {
                           <Star
                             key={i}
                             className={`h-4 w-4 ${
-                              i < review.rating ? 'text-yellow-400' : 'text-gray-300'
+                              i < review.rating ? 'text-secondary-400' : 'text-gray-300'
                             }`}
                             fill={i < review.rating ? 'currentColor' : 'none'}
                           />
@@ -495,7 +488,7 @@ export default function ClientProfile() {
                     </span>
                   </div>
                   {review.comment && (
-                    <div className="bg-white rounded-md p-3 border border-blue-100">
+                    <div className="bg-white rounded-md p-3 border border-primary-100">
                       <p className="text-gray-800 text-sm leading-relaxed italic break-words">
                         "{review.comment}"
                       </p>

@@ -155,9 +155,9 @@ export const QuestManager: React.FC<QuestManagerProps> = ({
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy': return 'text-green-500'
-      case 'medium': return 'text-yellow-500'
-      case 'hard': return 'text-orange-500'
+      case 'easy': return 'text-secondary-500'
+      case 'medium': return 'text-secondary-500'
+      case 'hard': return 'text-secondary-500'
       case 'expert': return 'text-red-500'
       default: return 'text-gray-500'
     }
@@ -368,7 +368,7 @@ export const QuestManager: React.FC<QuestManagerProps> = ({
                         +{quest.xpReward} XP
                       </span>
                       {quest.isRepeatable && (
-                        <span className="text-sm text-blue-600">
+                        <span className="text-sm text-primary-600">
                           Повторяемое
                         </span>
                       )}
@@ -385,7 +385,7 @@ export const QuestManager: React.FC<QuestManagerProps> = ({
                   <button
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                       quest.isActive
-                        ? 'bg-green-100 text-green-800'
+                        ? 'bg-secondary-100 text-secondary-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}
                   >

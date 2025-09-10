@@ -265,24 +265,39 @@ export default function ExecutorSettings() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Заголовок */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-primary-900 mb-2">
-            Настройки
-          </h1>
-          <p className="text-gray-600">
-            Управляйте настройками своего аккаунта и рабочего времени
-          </p>
+          <div className="relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl blur opacity-20"></div>
+            <div className="relative bg-gradient-to-r from-primary-500 to-secondary-600 rounded-2xl p-8 text-white">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+              
+              <div className="relative z-10 flex items-center">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl mr-6">
+                  <Settings className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold text-white mb-2">
+                    Настройки
+                  </h1>
+                  <p className="text-white/80 text-lg">
+                    Управляйте настройками своего аккаунта и рабочего времени
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Вкладки */}
         <div className="mb-8">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-2">
+            <nav className="flex space-x-2">
               <button
                 onClick={() => setActiveTab('notifications')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`py-3 px-6 rounded-xl font-medium text-sm transition-all duration-200 ${
                   activeTab === 'notifications'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-primary-500 text-white shadow-lg'
+                    : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
                 }`}
               >
                 <Bell className="h-4 w-4 inline mr-2" />
@@ -290,10 +305,10 @@ export default function ExecutorSettings() {
               </button>
               <button
                 onClick={() => setActiveTab('working-hours')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`py-3 px-6 rounded-xl font-medium text-sm transition-all duration-200 ${
                   activeTab === 'working-hours'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-primary-500 text-white shadow-lg'
+                    : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
                 }`}
               >
                 <Clock className="h-4 w-4 inline mr-2" />
@@ -301,10 +316,10 @@ export default function ExecutorSettings() {
               </button>
               <button
                 onClick={() => setActiveTab('privacy')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`py-3 px-6 rounded-xl font-medium text-sm transition-all duration-200 ${
                   activeTab === 'privacy'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-primary-500 text-white shadow-lg'
+                    : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
                 }`}
               >
                 <Shield className="h-4 w-4 inline mr-2" />
@@ -312,10 +327,10 @@ export default function ExecutorSettings() {
               </button>
               <button
                 onClick={() => setActiveTab('password')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`py-3 px-6 rounded-xl font-medium text-sm transition-all duration-200 ${
                   activeTab === 'password'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-primary-500 text-white shadow-lg'
+                    : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
                 }`}
               >
                 <Settings className="h-4 w-4 inline mr-2" />
@@ -323,10 +338,10 @@ export default function ExecutorSettings() {
               </button>
               <button
                 onClick={() => setActiveTab('support')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`py-3 px-6 rounded-xl font-medium text-sm transition-all duration-200 ${
                   activeTab === 'support'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-primary-500 text-white shadow-lg'
+                    : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
                 }`}
               >
                 <MessageSquare className="h-4 w-4 inline mr-2" />
@@ -338,7 +353,7 @@ export default function ExecutorSettings() {
 
         {/* Контент вкладок */}
         {activeTab === 'notifications' && (
-          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8 mb-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900 flex items-center">
               <Bell className="h-5 w-5 mr-2 text-primary-600" />
@@ -428,7 +443,7 @@ export default function ExecutorSettings() {
 
         {/* Рабочее время */}
         {activeTab === 'working-hours' && (
-        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8 mb-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900 flex items-center">
               <Clock className="h-5 w-5 mr-2 text-primary-600" />
@@ -489,7 +504,7 @@ export default function ExecutorSettings() {
 
         {/* Настройки конфиденциальности */}
         {activeTab === 'privacy' && (
-        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8 mb-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900 flex items-center">
               <Shield className="h-5 w-5 mr-2 text-primary-600" />
@@ -579,7 +594,7 @@ export default function ExecutorSettings() {
 
         {/* Смена пароля */}
         {activeTab === 'password' && (
-        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
             <AlertTriangle className="h-5 w-5 mr-2 text-primary-600" />
             Смена пароля
@@ -595,7 +610,7 @@ export default function ExecutorSettings() {
                   type={showPasswords.current ? 'text' : 'password'}
                   value={passwordForm.currentPassword}
                   onChange={(e) => handlePasswordChange('currentPassword', e.target.value)}
-                  className={passwordErrors.currentPassword ? 'border-red-500 pr-10' : 'pr-10'}
+                  className={passwordErrors.currentPassword ? 'border-secondary-500 pr-10' : 'pr-10'}
                 />
                 <button
                   type="button"
@@ -606,7 +621,7 @@ export default function ExecutorSettings() {
                 </button>
               </div>
               {passwordErrors.currentPassword && (
-                <p className="text-red-500 text-sm mt-1">{passwordErrors.currentPassword}</p>
+                <p className="text-secondary-500 text-sm mt-1">{passwordErrors.currentPassword}</p>
               )}
             </div>
 
@@ -619,7 +634,7 @@ export default function ExecutorSettings() {
                   type={showPasswords.new ? 'text' : 'password'}
                   value={passwordForm.newPassword}
                   onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
-                  className={passwordErrors.newPassword ? 'border-red-500 pr-10' : 'pr-10'}
+                  className={passwordErrors.newPassword ? 'border-secondary-500 pr-10' : 'pr-10'}
                 />
                 <button
                   type="button"
@@ -630,7 +645,7 @@ export default function ExecutorSettings() {
                 </button>
               </div>
               {passwordErrors.newPassword && (
-                <p className="text-red-500 text-sm mt-1">{passwordErrors.newPassword}</p>
+                <p className="text-secondary-500 text-sm mt-1">{passwordErrors.newPassword}</p>
               )}
             </div>
 
@@ -643,7 +658,7 @@ export default function ExecutorSettings() {
                   type={showPasswords.confirm ? 'text' : 'password'}
                   value={passwordForm.confirmPassword}
                   onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
-                  className={passwordErrors.confirmPassword ? 'border-red-500 pr-10' : 'pr-10'}
+                  className={passwordErrors.confirmPassword ? 'border-secondary-500 pr-10' : 'pr-10'}
                 />
                 <button
                   type="button"
@@ -654,7 +669,7 @@ export default function ExecutorSettings() {
                 </button>
               </div>
               {passwordErrors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">{passwordErrors.confirmPassword}</p>
+                <p className="text-secondary-500 text-sm mt-1">{passwordErrors.confirmPassword}</p>
               )}
             </div>
 
@@ -678,7 +693,7 @@ export default function ExecutorSettings() {
 
         {/* Служба поддержки */}
         {activeTab === 'support' && (
-          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-8">
             <SupportSystem userId={currentUser?.id || 1} />
           </div>
         )}

@@ -11,7 +11,6 @@ export interface User {
   status: string
   location?: string
   isVerified: boolean
-  legalStatus?: string
   createdAt: Date
 }
 
@@ -139,7 +138,6 @@ export async function registerUser(userData: {
   password: string
   role: string
   location?: string
-  legalStatus?: string
 }): Promise<User | null> {
   try {
     const user = await prisma.user.create({
@@ -152,7 +150,6 @@ export async function registerUser(userData: {
         status: userData.role === 'admin' ? 'active' : 'pending',
         location: userData.location,
         isVerified: userData.role === 'admin',
-        legalStatus: userData.legalStatus
       }
     })
 

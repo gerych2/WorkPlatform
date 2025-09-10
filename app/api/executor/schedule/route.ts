@@ -42,13 +42,26 @@ export async function GET(request: NextRequest) {
     }
 
     // Получаем рабочие часы исполнителя на этот день недели
-    const workingHours = await prisma.workingHours.findFirst({
+    let workingHours = await prisma.workingHours.findFirst({
       where: {
         executorId: parseInt(executorId),
         dayOfWeek: dayOfWeek,
         isWorking: true
       }
     })
+
+    // Если нет рабочих часов, создаем их по умолчанию (9:00 - 18:00)
+    if (!workingHours) {
+      workingHours = await prisma.workingHours.create({
+        data: {
+          executorId: parseInt(executorId),
+          dayOfWeek: dayOfWeek,
+          startTime: '09:00',
+          endTime: '18:00',
+          isWorking: true
+        }
+      })
+    }
 
     // Получаем события исполнителя на эту дату
     const events = await prisma.calendarEvent.findMany({
@@ -186,6 +199,13 @@ function generateAvailableSlots(workingHours: any, busySlots: any[]): string[] {
 
     if (!isBusy) {
       slots.push(slotStart)
+    }
+  }
+
+  // Если нет доступных слотов, создаем базовые слоты
+  if (slots.length === 0) {
+    for (let minutes = startMinutes; minutes < endMinutes; minutes += slotDuration) {
+      slots.push(minutesToTime(minutes))
     }
   }
 

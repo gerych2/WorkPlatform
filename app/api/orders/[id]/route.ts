@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { getUserDataFromToken } from '../../../../lib/serverUtils'
 import { ViolationSystem } from '../../../../lib/violationSystem'
+import { gamificationService } from '../../../../lib/gamification/gamificationService'
 
 const prisma = new PrismaClient()
 
@@ -264,6 +265,19 @@ export async function PATCH(
           }
         }
       })
+
+      // Добавляем XP за завершение заказа
+      try {
+        await gamificationService.addXp(userData.id, {
+          amount: 15, // XP за завершение заказа
+          source: 'order_completion',
+          description: 'Завершение заказа',
+          metadata: { orderId: orderId, categoryId: existingOrder.categoryId }
+        })
+      } catch (error) {
+        console.error('Error adding XP for order completion:', error)
+        // Не прерываем выполнение, если геймификация не работает
+      }
 
       return NextResponse.json({
         message: 'Order completed successfully',

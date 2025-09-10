@@ -133,9 +133,9 @@ export default function SupportSystem({ userId }: SupportSystemProps) {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'open': return <AlertCircle className="h-4 w-4 text-orange-500" />
-      case 'in_progress': return <Clock className="h-4 w-4 text-blue-500" />
-      case 'resolved': return <CheckCircle className="h-4 w-4 text-green-500" />
+      case 'open': return <AlertCircle className="h-4 w-4 text-secondary-500" />
+      case 'in_progress': return <Clock className="h-4 w-4 text-primary-500" />
+      case 'resolved': return <CheckCircle className="h-4 w-4 text-secondary-500" />
       case 'closed': return <CheckCircle className="h-4 w-4 text-gray-500" />
       default: return <AlertCircle className="h-4 w-4 text-gray-500" />
     }
@@ -153,9 +153,9 @@ export default function SupportSystem({ userId }: SupportSystemProps) {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'low': return 'text-green-600 bg-green-100'
-      case 'medium': return 'text-yellow-600 bg-yellow-100'
-      case 'high': return 'text-orange-600 bg-orange-100'
+      case 'low': return 'text-secondary-600 bg-secondary-100'
+      case 'medium': return 'text-secondary-600 bg-secondary-100'
+      case 'high': return 'text-secondary-600 bg-secondary-100'
       case 'urgent': return 'text-red-600 bg-red-100'
       default: return 'text-gray-600 bg-gray-100'
     }
@@ -175,7 +175,7 @@ export default function SupportSystem({ userId }: SupportSystemProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
       </div>
     )
   }
@@ -185,7 +185,7 @@ export default function SupportSystem({ userId }: SupportSystemProps) {
       {/* Заголовок */}
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          <MessageSquare className="h-6 w-6 text-blue-600 mr-3" />
+          <MessageSquare className="h-6 w-6 text-primary-600 mr-3" />
           <h2 className="text-xl font-semibold text-gray-900">Служба поддержки</h2>
         </div>
         <Button
@@ -222,7 +222,7 @@ export default function SupportSystem({ userId }: SupportSystemProps) {
                 <select
                   value={newTicket.category}
                   onChange={(e) => setNewTicket({ ...newTicket, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="general">Общие вопросы</option>
                   <option value="technical">Техническая поддержка</option>
@@ -239,7 +239,7 @@ export default function SupportSystem({ userId }: SupportSystemProps) {
                 <select
                   value={newTicket.priority}
                   onChange={(e) => setNewTicket({ ...newTicket, priority: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="low">Низкий</option>
                   <option value="medium">Средний</option>
@@ -257,7 +257,7 @@ export default function SupportSystem({ userId }: SupportSystemProps) {
                 value={newTicket.description}
                 onChange={(e) => setNewTicket({ ...newTicket, description: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Подробно опишите вашу проблему или вопрос"
                 required
               />
@@ -297,7 +297,7 @@ export default function SupportSystem({ userId }: SupportSystemProps) {
                   onClick={() => setSelectedTicket(ticket)}
                   className={`p-4 border rounded-lg cursor-pointer transition-colors ${
                     selectedTicket?.id === ticket.id
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-primary-500 bg-primary-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
@@ -364,7 +364,7 @@ export default function SupportSystem({ userId }: SupportSystemProps) {
                       key={message.id}
                       className={`p-3 rounded-lg ${
                         message.isFromAdmin
-                          ? 'bg-blue-50 ml-8'
+                          ? 'bg-primary-50 ml-8'
                           : 'bg-gray-50 mr-8'
                       }`}
                     >
@@ -392,7 +392,7 @@ export default function SupportSystem({ userId }: SupportSystemProps) {
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Напишите ваш ответ..."
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                     />
                     <Button
                       onClick={sendMessage}

@@ -7,7 +7,7 @@ const prisma = new PrismaClient()
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, email, phone, password, role, location, legalStatus, profile, referralCode } = body
+    const { name, email, phone, password, role, location, profile, referralCode } = body
 
     // Валидация обязательных полей
     if (!name || !email || !password || !role) {
@@ -60,8 +60,7 @@ export async function POST(request: Request) {
         role,
         status: 'active', // Все пользователи сразу активны для тестирования
         location,
-        isVerified: true, // Все пользователи верифицированы для тестирования
-        legalStatus
+        isVerified: true // Все пользователи верифицированы для тестирования
       }
     })
 
@@ -88,8 +87,8 @@ export async function POST(request: Request) {
             rating: 0,
             reviewsCount: 0,
             completedOrders: 0,
-            isVerified: false,
-            verificationStatus: 'pending'
+            isVerified: true,
+            verificationStatus: 'verified'
           }
         })
 
@@ -157,7 +156,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       message: role === 'executor'
-        ? 'Регистрация успешна! Ваши документы отправлены на проверку.'
+        ? 'Регистрация успешна! Добро пожаловать на платформу как исполнитель!'
         : 'Регистрация успешна! Добро пожаловать на платформу!',
       user: {
         id: newUser.id,
@@ -168,7 +167,6 @@ export async function POST(request: Request) {
         status: newUser.status,
         location: newUser.location,
         isVerified: newUser.isVerified,
-        legalStatus: newUser.legalStatus,
         createdAt: newUser.createdAt,
         lastLogin: newUser.lastLogin
       },

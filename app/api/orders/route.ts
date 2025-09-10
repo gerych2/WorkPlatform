@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { getUserDataFromToken } from '../../../lib/serverUtils'
+import { gamificationService } from '../../../lib/gamification/gamificationService'
 
 const prisma = new PrismaClient()
 
@@ -126,6 +127,19 @@ export async function POST(request: NextRequest) {
           data: notifications
         })
       }
+    }
+
+    // Добавляем XP за создание заказа
+    try {
+      await gamificationService.addXp(userData.id, {
+        amount: 10, // XP за создание заказа
+        source: 'order_creation',
+        description: 'Создание заказа',
+        metadata: { orderId: order.id, categoryId: order.categoryId }
+      })
+    } catch (error) {
+      console.error('Error adding XP for order creation:', error)
+      // Не прерываем выполнение, если геймификация не работает
     }
 
     return NextResponse.json({

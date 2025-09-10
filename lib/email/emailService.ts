@@ -17,7 +17,7 @@ interface EmailTemplate {
   text?: string
 }
 
-class EmailService {
+export class EmailService {
   private transporter!: nodemailer.Transporter
   private isDevelopment!: boolean
 

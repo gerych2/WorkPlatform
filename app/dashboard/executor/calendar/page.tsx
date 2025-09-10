@@ -434,9 +434,9 @@ export default function ExecutorCalendar() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'bg-green-100 text-green-800'
-      case 'pending': return 'bg-yellow-100 text-yellow-800'
-      case 'cancelled': return 'bg-red-100 text-red-800'
+      case 'confirmed': return 'bg-secondary-100 text-secondary-800'
+      case 'pending': return 'bg-secondary-100 text-secondary-800'
+      case 'cancelled': return 'bg-secondary-100 text-secondary-800'
       default: return 'bg-gray-100 text-gray-800'
     }
   }
@@ -478,16 +478,31 @@ export default function ExecutorCalendar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Заголовок */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-primary-900 mb-2">
-            Календарь
-          </h1>
-          <p className="text-gray-600">
-            Управляйте своим расписанием и заказами
-          </p>
+          <div className="relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl blur opacity-20"></div>
+            <div className="relative bg-gradient-to-r from-primary-500 to-secondary-600 rounded-2xl p-8 text-white">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+              
+              <div className="relative z-10 flex items-center">
+                <div className="p-4 bg-white/20 backdrop-blur-sm rounded-xl mr-6">
+                  <Calendar className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold text-white mb-2">
+                    Календарь
+                  </h1>
+                  <p className="text-white/80 text-lg">
+                    Управляйте своим расписанием и заказами
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Панель управления */}
-        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6 mb-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-6 mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <h2 className="text-xl font-semibold text-gray-900">
@@ -506,7 +521,7 @@ export default function ExecutorCalendar() {
                 })}
               </h2>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <Button
                   onClick={() => {
                     if (viewMode === 'month') navigateMonth('prev')
@@ -515,6 +530,7 @@ export default function ExecutorCalendar() {
                   }}
                   variant="outline"
                   size="sm"
+                  className="hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -522,6 +538,7 @@ export default function ExecutorCalendar() {
                   onClick={() => setCurrentDate(new Date())}
                   variant="outline"
                   size="sm"
+                  className="hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
                 >
                   Сегодня
                 </Button>
@@ -533,6 +550,7 @@ export default function ExecutorCalendar() {
                   }}
                   variant="outline"
                   size="sm"
+                  className="hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -540,33 +558,33 @@ export default function ExecutorCalendar() {
             </div>
 
             <div className="flex items-center space-x-3">
-              <div className="flex bg-secondary-100 rounded-lg p-1">
+              <div className="flex bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl p-1 shadow-inner">
                 <button
                   onClick={() => setViewMode('month')}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                     viewMode === 'month' 
-                      ? 'bg-white text-primary-600 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-primary-600 shadow-lg transform scale-105' 
+                      : 'text-gray-600 hover:text-primary-600 hover:bg-white/50'
                   }`}
                 >
                   Месяц
                 </button>
                 <button
                   onClick={() => setViewMode('week')}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                     viewMode === 'week' 
-                      ? 'bg-white text-primary-600 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-primary-600 shadow-lg transform scale-105' 
+                      : 'text-gray-600 hover:text-primary-600 hover:bg-white/50'
                   }`}
                 >
                   Неделя
                 </button>
                 <button
                   onClick={() => setViewMode('day')}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                     viewMode === 'day' 
-                      ? 'bg-white text-primary-600 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-primary-600 shadow-lg transform scale-105' 
+                      : 'text-gray-600 hover:text-primary-600 hover:bg-white/50'
                   }`}
                 >
                   День
@@ -576,7 +594,7 @@ export default function ExecutorCalendar() {
               <Button 
                 variant="outline" 
                 onClick={() => setShowWorkingHoursModal(true)}
-                className="flex items-center"
+                className="flex items-center hover:bg-secondary-50 hover:border-secondary-300 transition-all duration-200"
               >
                 <Settings className="h-4 w-4 mr-2" />
                 Рабочие часы
@@ -584,7 +602,7 @@ export default function ExecutorCalendar() {
               
               <Button 
                 onClick={() => setShowAddEventModal(true)}
-                className="flex items-center"
+                className="flex items-center hover:bg-primary-600 transition-all duration-200"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Добавить событие
@@ -595,7 +613,7 @@ export default function ExecutorCalendar() {
 
         {/* Календарь */}
         {viewMode === 'month' && (
-          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-6">
             {/* Заголовки дней недели */}
             <div className="grid grid-cols-7 gap-1 mb-4">
               {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
@@ -620,9 +638,9 @@ export default function ExecutorCalendar() {
                   <div
                     key={day.toISOString()}
                     onClick={() => handleDateClick(day)}
-                    className={`h-24 border border-secondary-200 rounded-lg p-2 cursor-pointer hover:bg-secondary-50 transition-colors ${
-                      isToday ? 'bg-primary-50 border-primary-300' : ''
-                    } ${isSelected ? 'ring-2 ring-primary-500' : ''}`}
+                    className={`h-24 border border-gray-200 rounded-xl p-3 cursor-pointer hover:bg-gradient-to-br hover:from-primary-50 hover:to-secondary-50 transition-all duration-200 hover:shadow-md hover:scale-105 ${
+                      isToday ? 'bg-gradient-to-br from-primary-100 to-secondary-100 border-primary-300 shadow-lg' : ''
+                    } ${isSelected ? 'ring-2 ring-primary-500 shadow-lg' : ''}`}
                   >
                     <div className={`text-sm font-medium mb-1 ${
                       isToday ? 'text-primary-600' : 'text-gray-900'
@@ -638,10 +656,10 @@ export default function ExecutorCalendar() {
                             e.stopPropagation()
                             handleEventClick(event)
                           }}
-                          className={`text-xs p-1 rounded truncate cursor-pointer ${
+                          className={`text-xs p-2 rounded-lg truncate cursor-pointer transition-all duration-200 hover:scale-105 ${
                             event.status === 'confirmed' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
+                              ? 'bg-gradient-to-r from-primary-100 to-primary-200 text-primary-800 shadow-sm' 
+                              : 'bg-gradient-to-r from-secondary-100 to-secondary-200 text-secondary-800 shadow-sm'
                           }`}
                         >
                           {event.time} - {event.title}
@@ -662,7 +680,7 @@ export default function ExecutorCalendar() {
 
         {/* Недельный вид */}
         {viewMode === 'week' && (
-          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-6">
             {/* Заголовки дней недели */}
             <div className="grid grid-cols-7 gap-1 mb-4">
               {getWeekDays(selectedDate).map(day => (
@@ -704,10 +722,10 @@ export default function ExecutorCalendar() {
                             e.stopPropagation()
                             handleEventClick(event)
                           }}
-                          className={`text-xs p-1 rounded truncate cursor-pointer ${
+                          className={`text-xs p-2 rounded-lg truncate cursor-pointer transition-all duration-200 hover:scale-105 ${
                             event.status === 'confirmed' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
+                              ? 'bg-gradient-to-r from-primary-100 to-primary-200 text-primary-800 shadow-sm' 
+                              : 'bg-gradient-to-r from-secondary-100 to-secondary-200 text-secondary-800 shadow-sm'
                           }`}
                         >
                           {event.title}
@@ -723,7 +741,7 @@ export default function ExecutorCalendar() {
 
         {/* Детальный вид дня */}
         {viewMode === 'day' && (
-          <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100/50 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               {selectedDate.toLocaleDateString('ru-RU', { 
                 weekday: 'long', 
@@ -794,7 +812,7 @@ export default function ExecutorCalendar() {
         {/* Модальное окно события */}
         {showEventModal && selectedEvent && (
           <div 
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-modal"
             onClick={() => setShowEventModal(false)}
           >
             <div 
@@ -882,7 +900,7 @@ export default function ExecutorCalendar() {
         {/* Модальное окно рабочих часов */}
         {showWorkingHoursModal && (
           <div 
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-modal"
             onClick={() => setShowWorkingHoursModal(false)}
           >
             <div 
@@ -900,7 +918,7 @@ export default function ExecutorCalendar() {
                 </div>
                 <button
                   onClick={() => setShowWorkingHoursModal(false)}
-                  className="text-gray-500 hover:text-gray-700 hover:bg-red-50 rounded-full p-2 transition-colors border border-gray-200 hover:border-red-300"
+                  className="text-gray-500 hover:text-gray-700 hover:bg-secondary-50 rounded-full p-2 transition-colors border border-gray-200 hover:border-secondary-300"
                   title="Закрыть (Esc)"
                 >
                   <X className="h-5 w-5" />
@@ -955,7 +973,7 @@ export default function ExecutorCalendar() {
                 <Button 
                   variant="outline" 
                   onClick={() => setShowWorkingHoursModal(false)}
-                  className="text-red-600 border-red-300 hover:bg-red-50"
+                  className="text-secondary-600 border-secondary-300 hover:bg-secondary-50"
                 >
                   <X className="h-4 w-4 mr-2" />
                   Закрыть
@@ -972,7 +990,7 @@ export default function ExecutorCalendar() {
         {/* Модальное окно добавления события */}
         {showAddEventModal && (
           <div 
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-modal"
             onClick={() => setShowAddEventModal(false)}
           >
             <div 

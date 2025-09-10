@@ -57,7 +57,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 
   return (
     <div className={`bg-white rounded-lg p-6 shadow-sm border border-secondary-200 transition-all duration-500 ${className} ${
-      isLevelingUp ? 'ring-4 ring-yellow-400 ring-opacity-50' : ''
+      isLevelingUp ? 'ring-4 ring-secondary-400 ring-opacity-50' : ''
     }`}>
       {/* Заголовок уровня */}
       <div className="flex items-center justify-between mb-4">
@@ -69,7 +69,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
           </span>
           <div>
             <h3 className={`text-xl font-semibold text-gray-900 transition-all duration-500 ${
-              isLevelingUp ? 'text-yellow-600' : ''
+              isLevelingUp ? 'text-secondary-600' : ''
             }`}>
               {levelTitle}
             </h3>
@@ -79,7 +79,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         <div className="text-right">
           <p className="text-sm text-gray-600">До следующего уровня</p>
           <p className={`font-semibold text-lg transition-all duration-500 ${
-            isLevelingUp ? 'text-yellow-600 scale-110' : ''
+            isLevelingUp ? 'text-secondary-600 scale-110' : ''
           }`} style={{ color: levelColor }}>
             {xpNeeded} XP
           </p>
@@ -136,7 +136,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       {/* Анимация повышения уровня */}
       {isLevelingUp && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full font-bold text-lg animate-bounce">
+          <div className="bg-secondary-400 text-secondary-900 px-4 py-2 rounded-full font-bold text-lg animate-bounce">
             🎉 ПОВЫШЕНИЕ УРОВНЯ! 🎉
           </div>
         </div>

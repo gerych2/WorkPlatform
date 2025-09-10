@@ -74,3 +74,5 @@ class MailgunService {
 }
 
 export const mailgunService = new MailgunService()
+
+

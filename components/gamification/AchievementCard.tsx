@@ -41,7 +41,7 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
 
       {/* Анимация для новых достижений */}
       {!isNotified && earnedAt && (
-        <div className="absolute -top-1 -left-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping" />
+        <div className="absolute -top-1 -left-1 w-3 h-3 bg-secondary-400 rounded-full animate-ping" />
       )}
 
       <div className="flex items-start space-x-3">
@@ -61,7 +61,7 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
           {/* Награда XP */}
           <div className="flex items-center space-x-2">
             <span className="text-sm font-medium text-gray-700">Награда:</span>
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary-100 text-secondary-800">
               +{xpReward} XP
             </span>
           </div>
@@ -85,3 +85,5 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
     </div>
   )
 }
+
+

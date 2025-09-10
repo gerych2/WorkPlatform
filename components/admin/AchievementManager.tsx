@@ -152,9 +152,9 @@ export const AchievementManager: React.FC<AchievementManagerProps> = ({
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
       case 'common': return 'text-gray-500'
-      case 'rare': return 'text-blue-500'
-      case 'epic': return 'text-purple-500'
-      case 'legendary': return 'text-orange-500'
+      case 'rare': return 'text-primary-500'
+      case 'epic': return 'text-primary-500'
+      case 'legendary': return 'text-secondary-500'
       default: return 'text-gray-500'
     }
   }
@@ -323,7 +323,7 @@ export const AchievementManager: React.FC<AchievementManagerProps> = ({
                     onClick={() => toggleActive(achievement.id, achievement.isActive)}
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                       achievement.isActive
-                        ? 'bg-green-100 text-green-800'
+                        ? 'bg-secondary-100 text-secondary-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}
                   >

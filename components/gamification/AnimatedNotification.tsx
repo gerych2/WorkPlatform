@@ -44,13 +44,13 @@ export const AnimatedNotification: React.FC<AnimatedNotificationProps> = ({
     
     switch (type) {
       case 'level_up':
-        return <Crown className="h-8 w-8 text-yellow-500" />
+        return <Crown className="h-8 w-8 text-secondary-500" />
       case 'achievement':
-        return <Trophy className="h-8 w-8 text-purple-500" />
+        return <Trophy className="h-8 w-8 text-primary-600" />
       case 'xp_gain':
-        return <Zap className="h-8 w-8 text-blue-500" />
+        return <Zap className="h-8 w-8 text-primary-500" />
       case 'referral':
-        return <Gift className="h-8 w-8 text-green-500" />
+        return <Gift className="h-8 w-8 text-secondary-600" />
       default:
         return <Star className="h-8 w-8 text-gray-500" />
     }
@@ -59,13 +59,13 @@ export const AnimatedNotification: React.FC<AnimatedNotificationProps> = ({
   const getBackgroundColor = () => {
     switch (type) {
       case 'level_up':
-        return 'bg-gradient-to-r from-yellow-400 to-orange-500'
+        return 'bg-gradient-to-r from-secondary-400 to-secondary-600'
       case 'achievement':
-        return 'bg-gradient-to-r from-purple-500 to-pink-500'
+        return 'bg-gradient-to-r from-primary-500 to-primary-700'
       case 'xp_gain':
-        return 'bg-gradient-to-r from-blue-500 to-cyan-500'
+        return 'bg-gradient-to-r from-primary-500 to-secondary-500'
       case 'referral':
-        return 'bg-gradient-to-r from-green-500 to-emerald-500'
+        return 'bg-gradient-to-r from-secondary-500 to-primary-500'
       default:
         return 'bg-gradient-to-r from-gray-500 to-gray-600'
     }
@@ -104,8 +104,8 @@ export const AnimatedNotification: React.FC<AnimatedNotificationProps> = ({
             {/* XP анимация */}
             {xpAmount && (
               <div className="flex items-center space-x-2">
-                <Zap className="h-4 w-4 text-yellow-300" />
-                <span className="text-yellow-300 font-bold text-lg animate-pulse">
+                <Zap className="h-4 w-4 text-secondary-300" />
+                <span className="text-secondary-300 font-bold text-lg animate-pulse">
                   +{xpAmount} XP
                 </span>
               </div>
@@ -162,7 +162,7 @@ export const NotificationManager: React.FC = () => {
   }, [])
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2">
+    <div className="fixed top-4 right-4 z-notification space-y-2">
       {notifications.map((notification, index) => (
         <div
           key={notification.id}
@@ -182,3 +182,5 @@ export const NotificationManager: React.FC = () => {
     </div>
   )
 }
+
+

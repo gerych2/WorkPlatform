@@ -62,7 +62,6 @@ export async function POST(request: Request) {
         status: user.status,
         location: user.location,
         isVerified: user.isVerified,
-        legalStatus: user.legalStatus
       }
     })
 

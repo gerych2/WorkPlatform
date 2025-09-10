@@ -243,11 +243,11 @@ export default function ClientSearch() {
           
           {/* Информация о прямом бронировании */}
           {selectedExecutor && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-blue-900">Прямое бронирование</h3>
-                  <p className="text-sm text-blue-700">
+                  <h3 className="font-medium text-primary-900">Прямое бронирование</h3>
+                  <p className="text-sm text-primary-700">
                     Выбран исполнитель: <span className="font-medium">{selectedExecutor.name}</span>
                   </p>
                 </div>
@@ -406,13 +406,13 @@ export default function ClientSearch() {
                   
                   <div className="flex items-center space-x-2">
                     {executor.isVerified && (
-                      <div className="flex items-center text-green-600">
+                      <div className="flex items-center text-secondary-600">
                         <CheckCircle className="h-4 w-4 mr-1" />
                         <span className="text-xs font-medium">Верифицирован</span>
                       </div>
                     )}
                     <div className={`w-2 h-2 rounded-full ${
-                      executor.status === 'active' ? 'bg-green-400' : 'bg-gray-400'
+                      executor.status === 'active' ? 'bg-secondary-400' : 'bg-gray-400'
                     }`} />
                   </div>
                 </div>
@@ -445,7 +445,7 @@ export default function ClientSearch() {
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="text-center">
                     <div className="flex items-center justify-center mb-1">
-                      <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                      <Star className="h-4 w-4 text-secondary-400 mr-1" />
                       <span className="font-semibold text-gray-900">
                         {executor.executorProfile?.rating ? 
                           Number(executor.executorProfile.rating).toFixed(1) : 

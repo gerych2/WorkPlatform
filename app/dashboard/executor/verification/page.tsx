@@ -260,9 +260,9 @@ export default function ExecutorVerification() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'verified':
-        return <CheckCircle className="h-5 w-5 text-green-600" />
+        return <CheckCircle className="h-5 w-5 text-secondary-600" />
       case 'partial':
-        return <Clock className="h-5 w-5 text-yellow-600" />
+        return <Clock className="h-5 w-5 text-secondary-600" />
       case 'failed':
         return <XCircle className="h-5 w-5 text-red-600" />
       default:
@@ -273,9 +273,9 @@ export default function ExecutorVerification() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'verified':
-        return 'bg-green-100 text-green-800'
+        return 'bg-secondary-100 text-secondary-800'
       case 'partial':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-secondary-100 text-secondary-800'
       case 'failed':
         return 'bg-red-100 text-red-800'
       default:
@@ -689,11 +689,11 @@ export default function ExecutorVerification() {
         </div>
 
         {/* Информация о верификации */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">
+        <div className="mt-8 bg-primary-50 border border-primary-200 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-primary-900 mb-2">
             Как работает верификация?
           </h3>
-          <ul className="text-blue-800 space-y-2">
+          <ul className="text-primary-800 space-y-2">
             <li>• <strong>Паспорт:</strong> Проверяется через базу данных МВД РБ</li>
             <li>• <strong>ЕГР РБ:</strong> Проверяется регистрационный номер в Едином государственном реестре</li>
             <li>• <strong>Справка о доходах:</strong> Проверяется через базу данных МНС РБ</li>
@@ -705,6 +705,8 @@ export default function ExecutorVerification() {
     </div>
   )
 }
+
+
 
 
 

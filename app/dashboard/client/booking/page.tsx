@@ -253,9 +253,9 @@ export default function CreateOrder() {
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case 'low': return 'text-green-600 bg-green-100'
-      case 'medium': return 'text-yellow-600 bg-yellow-100'
-      case 'high': return 'text-red-600 bg-red-100'
+      case 'low': return 'text-secondary-600 bg-secondary-100'
+      case 'medium': return 'text-secondary-600 bg-secondary-100'
+      case 'high': return 'text-secondary-600 bg-secondary-100'
       default: return 'text-gray-600 bg-gray-100'
     }
   }
@@ -335,10 +335,10 @@ export default function CreateOrder() {
                     onChange={handleCategorySelect}
                     placeholder="Начните вводить название услуги..."
                     searchPlaceholder="Поиск по категориям..."
-                    className={errors.categoryId ? 'border-red-500' : ''}
+                    className={errors.categoryId ? 'border-secondary-500' : ''}
                   />
                   {errors.categoryId && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                    <p className="text-secondary-500 text-sm mt-1 flex items-center">
                       <AlertTriangle className="h-4 w-4 mr-1" />
                       {errors.categoryId}
                     </p>
@@ -380,12 +380,12 @@ export default function CreateOrder() {
                   rows={4}
                   className={`w-full px-4 py-3 border-2 rounded-xl transition-all duration-200 ${
                     errors.serviceDescription 
-                      ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-200' 
+                      ? 'border-secondary-500 focus:border-secondary-500 focus:ring-2 focus:ring-red-200' 
                       : 'border-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200'
                   }`}
                 />
                 {errors.serviceDescription && (
-                  <p className="text-red-500 text-sm mt-1 flex items-center">
+                  <p className="text-secondary-500 text-sm mt-1 flex items-center">
                     <AlertTriangle className="h-4 w-4 mr-1" />
                     {errors.serviceDescription}
                   </p>
@@ -410,10 +410,10 @@ export default function CreateOrder() {
                     value={formData.clientName}
                     onChange={(e) => handleInputChange('clientName', e.target.value)}
                     placeholder="Имя и фамилия"
-                    className={errors.clientName ? 'border-red-500' : ''}
+                    className={errors.clientName ? 'border-secondary-500' : ''}
                   />
                   {errors.clientName && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                    <p className="text-secondary-500 text-sm mt-1 flex items-center">
                       <AlertTriangle className="h-4 w-4 mr-1" />
                       {errors.clientName}
                     </p>
@@ -429,10 +429,10 @@ export default function CreateOrder() {
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
                     placeholder="+375 (29) 123-45-67"
-                    className={errors.phone ? 'border-red-500' : ''}
+                    className={errors.phone ? 'border-secondary-500' : ''}
                   />
                   {errors.phone && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                    <p className="text-secondary-500 text-sm mt-1 flex items-center">
                       <AlertTriangle className="h-4 w-4 mr-1" />
                       {errors.phone}
                     </p>
@@ -448,10 +448,10 @@ export default function CreateOrder() {
                     value={formData.address}
                     onChange={(e) => handleInputChange('address', e.target.value)}
                     placeholder="Полный адрес выполнения работ"
-                    className={errors.address ? 'border-red-500' : ''}
+                    className={errors.address ? 'border-secondary-500' : ''}
                   />
                   {errors.address && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                    <p className="text-secondary-500 text-sm mt-1 flex items-center">
                       <AlertTriangle className="h-4 w-4 mr-1" />
                       {errors.address}
                     </p>
@@ -477,17 +477,17 @@ export default function CreateOrder() {
                     value={formData.orderDate}
                     onChange={(e) => handleInputChange('orderDate', e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className={errors.orderDate ? 'border-red-500' : ''}
+                    className={errors.orderDate ? 'border-secondary-500' : ''}
                     readOnly={!!localStorage.getItem('selectedDateTime')}
                   />
                   {localStorage.getItem('selectedDateTime') && (
-                    <p className="text-blue-600 text-sm mt-1 flex items-center">
+                    <p className="text-primary-600 text-sm mt-1 flex items-center">
                       <CheckCircle className="h-4 w-4 mr-1" />
                       Время выбрано в календаре исполнителя
                     </p>
                   )}
                   {errors.orderDate && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                    <p className="text-secondary-500 text-sm mt-1 flex items-center">
                       <AlertTriangle className="h-4 w-4 mr-1" />
                       {errors.orderDate}
                     </p>
@@ -502,17 +502,17 @@ export default function CreateOrder() {
                     type="time"
                     value={formData.orderTime}
                     onChange={(e) => handleInputChange('orderTime', e.target.value)}
-                    className={errors.orderTime ? 'border-red-500' : ''}
+                    className={errors.orderTime ? 'border-secondary-500' : ''}
                     readOnly={!!localStorage.getItem('selectedDateTime')}
                   />
                   {localStorage.getItem('selectedDateTime') && (
-                    <p className="text-blue-600 text-sm mt-1 flex items-center">
+                    <p className="text-primary-600 text-sm mt-1 flex items-center">
                       <CheckCircle className="h-4 w-4 mr-1" />
                       Время выбрано в календаре исполнителя
                     </p>
                   )}
                   {errors.orderTime && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                    <p className="text-secondary-500 text-sm mt-1 flex items-center">
                       <AlertTriangle className="h-4 w-4 mr-1" />
                       {errors.orderTime}
                     </p>
@@ -597,11 +597,11 @@ export default function CreateOrder() {
                       placeholder="100"
                       min="1"
                       step="0.01"
-                      className={`pl-10 ${errors.totalPrice ? 'border-red-500' : 'border-secondary-300'}`}
+                      className={`pl-10 ${errors.totalPrice ? 'border-secondary-500' : 'border-secondary-300'}`}
                     />
                   </div>
                   {errors.totalPrice && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                    <p className="text-secondary-500 text-sm mt-1 flex items-center">
                       <AlertTriangle className="h-4 w-4 mr-1" />
                       {errors.totalPrice}
                     </p>

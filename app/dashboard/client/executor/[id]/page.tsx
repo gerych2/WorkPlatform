@@ -183,8 +183,8 @@ export default function ExecutorProfileView() {
         responseTime: executorProfile.responseTime
       }))
       
-      // Перенаправляем на страницу бронирования
-      router.push('/dashboard/client/booking')
+      // Перенаправляем на страницу выбора времени (сначала дата, потом время)
+      router.push('/dashboard/client/select-time')
     }
   }
 
@@ -458,7 +458,7 @@ export default function ExecutorProfileView() {
                   Забронировать время
                 </Button>
                 <p className="text-xs text-gray-500 mt-3">
-                  Вы будете перенаправлены на страницу бронирования
+                  Сначала выберите дату, затем время
                 </p>
               </div>
             </div>

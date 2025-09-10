@@ -1,7 +1,16 @@
 {
-  "/admin/page": "app/admin/page.js",
   "/api/notifications/route": "app/api/notifications/route.js",
-  "/admin/login/page": "app/admin/login/page.js",
-  "/admin/orders/page": "app/admin/orders/page.js",
-  "/api/admin/orders/route": "app/api/admin/orders/route.js"
+  "/dashboard/client/page": "app/dashboard/client/page.js",
+  "/dashboard/client/orders/page": "app/dashboard/client/orders/page.js",
+  "/dashboard/client/orders/[id]/page": "app/dashboard/client/orders/[id]/page.js",
+  "/dashboard/client/profile/page": "app/dashboard/client/profile/page.js",
+  "/dashboard/client/settings/page": "app/dashboard/client/settings/page.js",
+  "/api/users/[id]/route": "app/api/users/[id]/route.js",
+  "/api/orders/route": "app/api/orders/route.js",
+  "/api/categories/route": "app/api/categories/route.js",
+  "/api/executors/route": "app/api/executors/route.js",
+  "/api/gamification/stats/route": "app/api/gamification/stats/route.js",
+  "/api/gamification/achievements/route": "app/api/gamification/achievements/route.js",
+  "/api/gamification/referral/route": "app/api/gamification/referral/route.js",
+  "/dashboard/client/booking/page": "app/dashboard/client/booking/page.js"
 }

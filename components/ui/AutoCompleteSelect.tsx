@@ -182,7 +182,7 @@ export function AutoCompleteSelect<T extends Option>({
 
       {/* Выпадающий список */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-secondary-200 rounded-xl shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-dropdown w-full mt-1 bg-white border border-secondary-200 rounded-xl shadow-lg max-h-60 overflow-auto">
           {/* Поле поиска */}
           <div className="p-3 border-b border-secondary-100">
             <input

@@ -102,9 +102,9 @@ export const ReferralSystem: React.FC<ReferralSystemProps> = ({
           <div className="text-2xl font-bold text-primary-600">{referralStats.totalReferrals}</div>
           <div className="text-sm text-primary-700">Приглашено друзей</div>
         </div>
-        <div className="text-center p-4 bg-green-50 rounded-lg">
-          <div className="text-2xl font-bold text-green-600">{referralStats.totalEarnings} XP</div>
-          <div className="text-sm text-green-700">Заработано XP</div>
+        <div className="text-center p-4 bg-secondary-50 rounded-lg">
+          <div className="text-2xl font-bold text-secondary-600">{referralStats.totalEarnings} XP</div>
+          <div className="text-sm text-secondary-700">Заработано XP</div>
         </div>
       </div>
 
@@ -156,55 +156,55 @@ export const ReferralSystem: React.FC<ReferralSystemProps> = ({
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">🎁 Награды за приглашения</h3>
         <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-secondary-50 rounded-lg">
             <div className="flex items-center space-x-3">
-              <Gift className="h-5 w-5 text-yellow-600" />
+              <Gift className="h-5 w-5 text-secondary-600" />
               <div>
                 <div className="font-medium text-gray-900">Регистрация друга</div>
                 <div className="text-sm text-gray-600">+100 XP + Приоритет в поиске</div>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm font-medium text-yellow-600">+100 XP</div>
+              <div className="text-sm font-medium text-secondary-600">+100 XP</div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-secondary-50 rounded-lg">
             <div className="flex items-center space-x-3">
-              <Star className="h-5 w-5 text-green-600" />
+              <Star className="h-5 w-5 text-secondary-600" />
               <div>
                 <div className="font-medium text-gray-900">Первый поиск друга</div>
                 <div className="text-sm text-gray-600">+50 XP + VIP статус</div>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm font-medium text-green-600">+50 XP</div>
+              <div className="text-sm font-medium text-secondary-600">+50 XP</div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-primary-50 rounded-lg">
             <div className="flex items-center space-x-3">
-              <Users className="h-5 w-5 text-purple-600" />
+              <Users className="h-5 w-5 text-primary-600" />
               <div>
                 <div className="font-medium text-gray-900">5 друзей</div>
                 <div className="text-sm text-gray-600">+300 XP + Статус амбассадора</div>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm font-medium text-purple-600">+300 XP</div>
+              <div className="text-sm font-medium text-primary-600">+300 XP</div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-primary-50 rounded-lg">
             <div className="flex items-center space-x-3">
-              <CreditCard className="h-5 w-5 text-blue-600" />
+              <CreditCard className="h-5 w-5 text-primary-600" />
               <div>
                 <div className="font-medium text-gray-900">Реферал-исполнитель подписался</div>
                 <div className="text-sm text-gray-600">+300 XP + Неделя бесплатной подписки</div>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm font-medium text-blue-600">+300 XP</div>
+              <div className="text-sm font-medium text-primary-600">+300 XP</div>
             </div>
           </div>
         </div>

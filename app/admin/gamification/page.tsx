@@ -141,8 +141,8 @@ export default function AdminGamificationPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
             <div className="flex items-center">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Users className="h-6 w-6 text-blue-600" />
+              <div className="p-3 bg-primary-100 rounded-lg">
+                <Users className="h-6 w-6 text-primary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Всего пользователей</p>
@@ -153,8 +153,8 @@ export default function AdminGamificationPage() {
 
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
             <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Activity className="h-6 w-6 text-green-600" />
+              <div className="p-3 bg-secondary-100 rounded-lg">
+                <Activity className="h-6 w-6 text-secondary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Активных пользователей</p>
@@ -165,8 +165,8 @@ export default function AdminGamificationPage() {
 
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
             <div className="flex items-center">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Zap className="h-6 w-6 text-purple-600" />
+              <div className="p-3 bg-primary-100 rounded-lg">
+                <Zap className="h-6 w-6 text-primary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Всего XP заработано</p>
@@ -177,8 +177,8 @@ export default function AdminGamificationPage() {
 
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
             <div className="flex items-center">
-              <div className="p-3 bg-yellow-100 rounded-lg">
-                <Trophy className="h-6 w-6 text-yellow-600" />
+              <div className="p-3 bg-secondary-100 rounded-lg">
+                <Trophy className="h-6 w-6 text-secondary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Достижений получено</p>
@@ -204,7 +204,7 @@ export default function AdminGamificationPage() {
                   onClick={() => setActiveTab(key as any)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                     activeTab === key
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-primary-500 text-primary-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -232,7 +232,7 @@ export default function AdminGamificationPage() {
                         <div className="flex items-center space-x-3">
                           <div className="w-32 bg-gray-200 rounded-full h-2">
                             <div
-                              className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                              className="bg-primary-500 h-2 rounded-full transition-all duration-500"
                               style={{ width: `${(level.count / stats.totalUsers) * 100}%` }}
                             />
                           </div>
@@ -257,7 +257,7 @@ export default function AdminGamificationPage() {
                         <div className="flex items-center space-x-3">
                           <div className="w-32 bg-gray-200 rounded-full h-2">
                             <div
-                              className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                              className="bg-secondary-500 h-2 rounded-full transition-all duration-500"
                               style={{ width: `${(achievement.earned / achievement.total) * 100}%` }}
                             />
                           </div>
@@ -303,34 +303,34 @@ export default function AdminGamificationPage() {
             {activeTab === 'achievements' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-blue-50 rounded-lg p-4">
+                  <div className="bg-primary-50 rounded-lg p-4">
                     <div className="flex items-center">
-                      <Award className="h-8 w-8 text-blue-600" />
+                      <Award className="h-8 w-8 text-primary-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-blue-900">Всего достижений</p>
-                        <p className="text-2xl font-bold text-blue-600">{stats.totalAchievements}</p>
+                        <p className="text-sm font-medium text-primary-900">Всего достижений</p>
+                        <p className="text-2xl font-bold text-primary-600">{stats.totalAchievements}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-green-50 rounded-lg p-4">
+                  <div className="bg-secondary-50 rounded-lg p-4">
                     <div className="flex items-center">
-                      <Star className="h-8 w-8 text-green-600" />
+                      <Star className="h-8 w-8 text-secondary-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-green-900">Среднее на пользователя</p>
-                        <p className="text-2xl font-bold text-green-600">
+                        <p className="text-sm font-medium text-secondary-900">Среднее на пользователя</p>
+                        <p className="text-2xl font-bold text-secondary-600">
                           {Math.round(stats.totalAchievements / stats.totalUsers)}
                         </p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-purple-50 rounded-lg p-4">
+                  <div className="bg-primary-50 rounded-lg p-4">
                     <div className="flex items-center">
-                      <Target className="h-8 w-8 text-purple-600" />
+                      <Target className="h-8 w-8 text-primary-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-purple-900">Процент получения</p>
-                        <p className="text-2xl font-bold text-purple-600">
+                        <p className="text-sm font-medium text-primary-900">Процент получения</p>
+                        <p className="text-2xl font-bold text-primary-600">
                           {((stats.totalAchievements / stats.totalUsers) * 100).toFixed(1)}%
                         </p>
                       </div>
@@ -343,32 +343,32 @@ export default function AdminGamificationPage() {
             {activeTab === 'referrals' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-green-50 rounded-lg p-4">
+                  <div className="bg-secondary-50 rounded-lg p-4">
                     <div className="flex items-center">
-                      <Gift className="h-8 w-8 text-green-600" />
+                      <Gift className="h-8 w-8 text-secondary-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-green-900">Всего рефералов</p>
-                        <p className="text-2xl font-bold text-green-600">{stats.referralStats.totalReferrals}</p>
+                        <p className="text-sm font-medium text-secondary-900">Всего рефералов</p>
+                        <p className="text-2xl font-bold text-secondary-600">{stats.referralStats.totalReferrals}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-blue-50 rounded-lg p-4">
+                  <div className="bg-primary-50 rounded-lg p-4">
                     <div className="flex items-center">
-                      <Users className="h-8 w-8 text-blue-600" />
+                      <Users className="h-8 w-8 text-primary-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-blue-900">Успешных рефералов</p>
-                        <p className="text-2xl font-bold text-blue-600">{stats.referralStats.successfulReferrals}</p>
+                        <p className="text-sm font-medium text-primary-900">Успешных рефералов</p>
+                        <p className="text-2xl font-bold text-primary-600">{stats.referralStats.successfulReferrals}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-purple-50 rounded-lg p-4">
+                  <div className="bg-primary-50 rounded-lg p-4">
                     <div className="flex items-center">
-                      <TrendingUp className="h-8 w-8 text-purple-600" />
+                      <TrendingUp className="h-8 w-8 text-primary-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-purple-900">Конверсия рефералов</p>
-                        <p className="text-2xl font-bold text-purple-600">{stats.referralStats.referralRate}%</p>
+                        <p className="text-sm font-medium text-primary-900">Конверсия рефералов</p>
+                        <p className="text-2xl font-bold text-primary-600">{stats.referralStats.referralRate}%</p>
                       </div>
                     </div>
                   </div>
@@ -379,32 +379,32 @@ export default function AdminGamificationPage() {
             {activeTab === 'subscriptions' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-green-50 rounded-lg p-4">
+                  <div className="bg-secondary-50 rounded-lg p-4">
                     <div className="flex items-center">
-                      <Crown className="h-8 w-8 text-green-600" />
+                      <Crown className="h-8 w-8 text-secondary-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-green-900">Всего подписок</p>
-                        <p className="text-2xl font-bold text-green-600">{stats.subscriptionStats.totalSubscriptions}</p>
+                        <p className="text-sm font-medium text-secondary-900">Всего подписок</p>
+                        <p className="text-2xl font-bold text-secondary-600">{stats.subscriptionStats.totalSubscriptions}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-blue-50 rounded-lg p-4">
+                  <div className="bg-primary-50 rounded-lg p-4">
                     <div className="flex items-center">
-                      <TrendingUp className="h-8 w-8 text-blue-600" />
+                      <TrendingUp className="h-8 w-8 text-primary-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-blue-900">Месячная выручка</p>
-                        <p className="text-2xl font-bold text-blue-600">${stats.subscriptionStats.monthlyRevenue.toLocaleString()}</p>
+                        <p className="text-sm font-medium text-primary-900">Месячная выручка</p>
+                        <p className="text-2xl font-bold text-primary-600">${stats.subscriptionStats.monthlyRevenue.toLocaleString()}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-purple-50 rounded-lg p-4">
+                  <div className="bg-primary-50 rounded-lg p-4">
                     <div className="flex items-center">
-                      <Target className="h-8 w-8 text-purple-600" />
+                      <Target className="h-8 w-8 text-primary-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-purple-900">Конверсия в подписку</p>
-                        <p className="text-2xl font-bold text-purple-600">{stats.subscriptionStats.conversionRate}%</p>
+                        <p className="text-sm font-medium text-primary-900">Конверсия в подписку</p>
+                        <p className="text-2xl font-bold text-primary-600">{stats.subscriptionStats.conversionRate}%</p>
                       </div>
                     </div>
                   </div>
@@ -417,3 +417,5 @@ export default function AdminGamificationPage() {
     </div>
   )
 }
+
+

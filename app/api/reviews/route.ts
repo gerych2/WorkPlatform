@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { getUserDataFromToken } from '../../../lib/serverUtils'
+import { gamificationService } from '../../../lib/gamification/gamificationService'
 
 const prisma = new PrismaClient()
 
@@ -117,6 +118,14 @@ export async function POST(request: Request) {
         reviewedId: !!reviewedId,
         clientId: !!clientId,
         executorId: !!executorId
+      })
+      console.log('API Reviews - Значения полей:', {
+        orderId,
+        rating,
+        reviewerId,
+        reviewedId,
+        clientId,
+        executorId
       })
       return NextResponse.json(
         { error: 'Все обязательные поля должны быть заполнены' },
@@ -260,6 +269,24 @@ export async function POST(request: Request) {
           }
         })
       }
+    }
+
+    // Добавляем XP за создание отзыва
+    try {
+      await gamificationService.addXp(parseInt(reviewerId), {
+        amount: 10, // XP за создание отзыва
+        source: 'review_creation',
+        description: 'Создание отзыва',
+        metadata: { 
+          reviewId: newReview.id, 
+          orderId: parseInt(orderId),
+          rating: parseInt(rating),
+          reviewedId: parseInt(reviewedId)
+        }
+      })
+    } catch (error) {
+      console.error('Error adding XP for review creation:', error)
+      // Не прерываем выполнение, если геймификация не работает
     }
 
     return NextResponse.json({

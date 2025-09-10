@@ -6,16 +6,20 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Starting database seeding...')
 
-  // Очищаем существующие данные
-  await prisma.review.deleteMany()
-  await prisma.order.deleteMany()
-  await prisma.subscription.deleteMany()
-  await prisma.executorDocument.deleteMany()
-  await prisma.executorProfile.deleteMany()
-  await prisma.notification.deleteMany()
-  await prisma.complaint.deleteMany()
-  await prisma.user.deleteMany()
-  await prisma.category.deleteMany()
+  // Очищаем существующие данные в правильном порядке
+  try {
+    await prisma.review.deleteMany()
+    await prisma.order.deleteMany()
+    await prisma.subscription.deleteMany()
+    await prisma.executorDocument.deleteMany()
+    await prisma.notification.deleteMany()
+    await prisma.complaint.deleteMany()
+    await prisma.executorProfile.deleteMany()
+    await prisma.user.deleteMany()
+    await prisma.category.deleteMany()
+  } catch (error) {
+    console.log('⚠️  Some data could not be cleared, continuing...')
+  }
 
   console.log('🗑️  Existing data cleared')
 
@@ -126,7 +130,6 @@ async function main() {
       status: 'active',
       location: 'Минск',
       isVerified: true,
-      legalStatus: null
     }
   })
 
@@ -140,7 +143,6 @@ async function main() {
       status: 'active',
       location: 'Минск',
       isVerified: true,
-      legalStatus: null
     }
   })
 

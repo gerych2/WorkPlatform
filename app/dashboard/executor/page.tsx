@@ -154,9 +154,9 @@ export default function ExecutorDashboard() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'bg-green-100 text-green-800'
+        return 'bg-secondary-100 text-secondary-800'
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-secondary-100 text-secondary-800'
       case 'cancelled':
         return 'bg-red-100 text-red-800'
       default:
@@ -258,27 +258,26 @@ export default function ExecutorDashboard() {
               </div>
               <div className="text-right">
                 <p className="text-sm text-gray-500">Статус: {currentUser.status}</p>
-                <p className="text-sm text-gray-500">Правовой статус: {currentUser.legalStatus === 'legal' ? 'Юридическое лицо' : 'Частное лицо'}</p>
               </div>
             </div>
           </div>
         )}
         {/* Статус подписки */}
         {subscription && (
-          <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="mb-8 p-4 bg-secondary-50 border border-secondary-200 rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Crown className="h-6 w-6 text-green-600" />
+                <Crown className="h-6 w-6 text-secondary-600" />
                 <div>
-                  <h3 className="text-lg font-semibold text-green-900">
+                  <h3 className="text-lg font-semibold text-secondary-900">
                     Активная подписка
                   </h3>
-                  <p className="text-green-700">
+                  <p className="text-secondary-700">
                     {subscription.planType} план • Действует до {new Date(subscription.endDate).toLocaleDateString('ru-RU')}
                   </p>
                 </div>
               </div>
-              <span className="text-green-700 font-medium">
+              <span className="text-secondary-700 font-medium">
                 {subscription.amount} BYN
               </span>
             </div>
@@ -289,8 +288,8 @@ export default function ExecutorDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CheckCircle className="h-6 w-6 text-green-600" />
+              <div className="p-2 bg-secondary-100 rounded-lg">
+                <CheckCircle className="h-6 w-6 text-secondary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Выполнено заказов</p>
@@ -303,8 +302,8 @@ export default function ExecutorDashboard() {
 
           <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Star className="h-6 w-6 text-yellow-600" />
+              <div className="p-2 bg-secondary-100 rounded-lg">
+                <Star className="h-6 w-6 text-secondary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Средний рейтинг</p>
@@ -472,7 +471,7 @@ export default function ExecutorDashboard() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Верификация:</span>
                   <span className={`text-sm font-medium ${
-                    executorProfile?.isVerified ? 'text-green-600' : 'text-yellow-600'
+                    executorProfile?.isVerified ? 'text-secondary-600' : 'text-secondary-600'
                   }`}>
                     {executorProfile?.isVerified ? 'Верифицирован' : 'На проверке'}
                   </span>

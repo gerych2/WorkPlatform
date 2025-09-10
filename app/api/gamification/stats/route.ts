@@ -7,15 +7,21 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
 
+    console.log('🎮 API Gamification Stats - Запрос для пользователя:', userId)
+
     if (!userId) {
+      console.log('🎮 API Gamification Stats - Ошибка: User ID не предоставлен')
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
+    console.log('🎮 API Gamification Stats - Получение статистики для пользователя:', userId)
     const stats = await gamificationService.getUserStats(parseInt(userId))
+    
+    console.log('🎮 API Gamification Stats - Статистика получена:', stats)
     
     return NextResponse.json({ success: true, data: stats })
   } catch (error) {
-    console.error('Error fetching gamification stats:', error)
+    console.error('🎮 API Gamification Stats - Ошибка:', error)
     return NextResponse.json(
       { error: 'Failed to fetch gamification stats' },
       { status: 500 }

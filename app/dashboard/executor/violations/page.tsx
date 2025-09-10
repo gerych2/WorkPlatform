@@ -102,8 +102,8 @@ export default function ExecutorViolations() {
 
   const getSeverityColor = (severity: number) => {
     switch (severity) {
-      case 1: return 'bg-yellow-100 text-yellow-800'
-      case 2: return 'bg-orange-100 text-orange-800'
+      case 1: return 'bg-secondary-100 text-secondary-800'
+      case 2: return 'bg-secondary-100 text-secondary-800'
       case 3: return 'bg-red-100 text-red-800'
       case 4: return 'bg-red-200 text-red-900'
       default: return 'bg-gray-100 text-gray-800'
@@ -174,7 +174,7 @@ export default function ExecutorViolations() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
             <div className="flex items-center">
-              <AlertTriangle className="h-8 w-8 text-yellow-600 mr-4" />
+              <AlertTriangle className="h-8 w-8 text-secondary-600 mr-4" />
               <div>
                 <p className="text-sm font-medium text-gray-600">Всего нарушений</p>
                 <p className="text-2xl font-bold text-gray-900">{violations.length}</p>
@@ -184,7 +184,7 @@ export default function ExecutorViolations() {
 
           <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
             <div className="flex items-center">
-              <Clock className="h-8 w-8 text-blue-600 mr-4" />
+              <Clock className="h-8 w-8 text-primary-600 mr-4" />
               <div>
                 <p className="text-sm font-medium text-gray-600">Последнее нарушение</p>
                 <p className="text-sm font-bold text-gray-900">
@@ -196,7 +196,7 @@ export default function ExecutorViolations() {
 
           <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
             <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-600 mr-4" />
+              <CheckCircle className="h-8 w-8 text-secondary-600 mr-4" />
               <div>
                 <p className="text-sm font-medium text-gray-600">Статус</p>
                 <p className="text-sm font-bold text-gray-900">
@@ -215,7 +215,7 @@ export default function ExecutorViolations() {
 
           {violations.length === 0 ? (
             <div className="p-8 text-center">
-              <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+              <CheckCircle className="h-16 w-16 text-secondary-500 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
                 Нарушений не найдено
               </h3>
@@ -259,16 +259,16 @@ export default function ExecutorViolations() {
         </div>
 
         {/* Информация о системе */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-3">
+        <div className="mt-8 bg-primary-50 border border-primary-200 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-primary-900 mb-3">
             Система контроля качества
           </h3>
-          <div className="text-sm text-blue-800 space-y-2">
+          <div className="text-sm text-primary-800 space-y-2">
             <p>• <strong>1-е нарушение:</strong> Предупреждение</p>
             <p>• <strong>2-е нарушение:</strong> Блокировка на 3 дня</p>
             <p>• <strong>3-е нарушение:</strong> Блокировка на 7 дней</p>
             <p>• <strong>4-е и последующие:</strong> Блокировка на 30 дней</p>
-            <p className="mt-3 text-blue-700">
+            <p className="mt-3 text-primary-700">
               <strong>Важно:</strong> Вы можете отменить заказ в течение 12 часов после принятия без последствий.
             </p>
           </div>

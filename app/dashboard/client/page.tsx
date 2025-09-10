@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation'
 import { Header } from '../../../components/layout/Header'
 import { Button } from '../../../components/ui/Button'
 import { Input } from '../../../components/ui/Input'
-import { Search, Star, MapPin, Clock, Phone, User, Settings, Loader2, Trophy } from 'lucide-react'
+import { Search, Star, MapPin, Clock, Phone, User, Settings, Trophy } from 'lucide-react'
+import { LoadingSpinner, FullScreenLoader } from '../../../components/ui/LoadingSpinner'
 import { GamificationDashboard } from '../../../components/gamification/GamificationDashboard'
 import { NotificationCenter } from '../../../components/gamification/NotificationCenter'
 
@@ -162,10 +163,10 @@ export default function ClientDashboard() {
 
   const getStatusColor = (status: string) => {
     const colorMap: { [key: string]: string } = {
-      'pending': 'bg-yellow-100 text-yellow-800',
+      'pending': 'bg-secondary-100 text-secondary-800',
       'confirmed': 'bg-primary-100 text-primary-800',
       'in_progress': 'bg-secondary-100 text-secondary-800',
-      'completed': 'bg-green-100 text-green-800',
+      'completed': 'bg-secondary-100 text-secondary-800',
       'cancelled': 'bg-red-100 text-red-800'
     }
     return colorMap[status] || 'bg-gray-100 text-gray-800'
@@ -173,65 +174,92 @@ export default function ClientDashboard() {
 
   // Если не аутентифицирован, показываем загрузку
   if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 text-primary-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Проверка аутентификации...</p>
-        </div>
-      </div>
-    )
+    return <FullScreenLoader text="Проверка аутентификации..." />
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 text-primary-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Загрузка данных...</p>
-        </div>
-      </div>
-    )
+    return <FullScreenLoader text="Загрузка данных..." />
   }
 
   return (
     <div className="min-h-screen bg-secondary-50">
       <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Приветствие */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-primary-900 mb-2">
-            Добро пожаловать, {currentUser?.name || 'Клиент'}! 👋
-          </h1>
-          <p className="text-gray-600">
-            Управляйте своими заказами и находите лучших мастеров для ваших задач
-          </p>
+        {/* Hero Section */}
+        <div className="relative mb-12">
+          <div className="bg-gradient-to-r from-primary-600 via-teal-600 to-primary-600 rounded-3xl p-8 text-white relative overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full -translate-y-48 translate-x-48"></div>
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full translate-y-32 -translate-x-32"></div>
+            </div>
+            
+            <div className="relative z-10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-4xl font-bold mb-3">
+                    Добро пожаловать, {currentUser?.name || 'Клиент'}! 👋
+                  </h1>
+                  <p className="text-xl text-white/90 mb-6">
+                    Управляйте своими заказами и находите лучших мастеров для ваших задач
+                  </p>
+                  
+                  {/* Quick Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
+                      <div className="text-2xl font-bold">{recentOrders.length}</div>
+                      <div className="text-white/80 text-sm">Активных заказов</div>
+                    </div>
+                    <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
+                      <div className="text-2xl font-bold">{categories.length}</div>
+                      <div className="text-white/80 text-sm">Доступных категорий</div>
+                    </div>
+                    <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
+                      <div className="text-2xl font-bold">{topExecutors.length}</div>
+                      <div className="text-white/80 text-sm">Рекомендуемых мастеров</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="hidden lg:block">
+                  <div className="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <User className="h-16 w-16 text-white" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Вкладки */}
+        {/* Modern Tabs */}
         <div className="mb-8">
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg border border-white/20">
+            <nav className="flex space-x-2">
               <button
                 onClick={() => setActiveTab('dashboard')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                className={`flex-1 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${
                   activeTab === 'dashboard'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-lg transform scale-105'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
-                📊 Дашборд
+                <div className="flex items-center justify-center">
+                  <span className="text-lg mr-2">📊</span>
+                  Дашборд
+                </div>
               </button>
               <button
                 onClick={() => setActiveTab('gamification')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                className={`flex-1 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-300 ${
                   activeTab === 'gamification'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-gradient-to-r from-primary-600 to-secondary-600 text-white shadow-lg transform scale-105'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
-                <Trophy className="h-4 w-4 inline mr-2" />
-                Геймификация
+                <div className="flex items-center justify-center">
+                  <Trophy className="h-5 w-5 mr-2" />
+                  Геймификация
+                </div>
               </button>
             </nav>
           </div>
@@ -327,46 +355,68 @@ export default function ClientDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Последние заказы */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">📋 Последние заказы</h2>
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-2xl flex items-center justify-center mr-4">
+                    <span className="text-white text-xl">📋</span>
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Последние заказы</h2>
+                    <p className="text-gray-600">Ваши недавние заказы и их статус</p>
+                  </div>
+                </div>
                 <Link href="/dashboard/client/orders">
-                  <Button variant="outline" size="sm">
+                  <button className="bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-6 py-3 rounded-xl hover:from-primary-700 hover:to-secondary-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105">
                     Все заказы
-                  </Button>
+                  </button>
                 </Link>
               </div>
               
               {recentOrders.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {recentOrders.map((order) => (
-                    <div key={order.id} className="border border-secondary-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="font-medium text-gray-900 mb-1">
-                            {order.serviceDescription}
-                          </h3>
-                          <p className="text-sm text-gray-600 mb-2">
-                            Категория: {order.category?.name}
-                          </p>
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
-                            <span className="flex items-center">
-                              <MapPin className="h-4 w-4 mr-1" />
-                              {order.address}
-                            </span>
-                            <span className="flex items-center">
-                              <Clock className="h-4 w-4 mr-1" />
-                              {new Date(order.orderDate).toLocaleDateString('ru-RU')}
-                            </span>
+                    <div key={order.id} className="group relative">
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-1000 group-hover:duration-200"></div>
+                      <div className="relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100/50 hover:border-indigo-200/50 transition-all duration-300 group-hover:scale-105">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center mb-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-xl flex items-center justify-center mr-4">
+                                <span className="text-white text-sm font-bold">
+                                  {order.category?.name?.charAt(0) || '?'}
+                                </span>
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                                  {order.serviceDescription}
+                                </h3>
+                                <p className="text-sm text-primary-600 font-medium">
+                                  {order.category?.name}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-6 text-sm text-gray-600 mb-4">
+                              <div className="flex items-center bg-gray-50 rounded-lg px-3 py-2">
+                                <MapPin className="h-4 w-4 mr-2 text-primary-500" />
+                                <span className="font-medium">{order.address}</span>
+                              </div>
+                              <div className="flex items-center bg-gray-50 rounded-lg px-3 py-2">
+                                <Clock className="h-4 w-4 mr-2 text-secondary-500" />
+                                <span className="font-medium">{new Date(order.orderDate).toLocaleDateString('ru-RU')}</span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div className="text-right">
-                          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
-                            {getStatusText(order.status)}
-                          </span>
-                          <p className="text-lg font-bold text-gray-900 mt-2">
-                            {order.totalPrice} BYN
-                          </p>
+                          
+                          <div className="text-right">
+                            <span className={`inline-flex px-4 py-2 text-sm font-semibold rounded-xl ${getStatusColor(order.status)}`}>
+                              {getStatusText(order.status)}
+                            </span>
+                            <p className="text-2xl font-bold text-gray-900 mt-3">
+                              {order.totalPrice} BYN
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -390,28 +440,41 @@ export default function ClientDashboard() {
 
           {/* Топ исполнители */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">⭐ Топ исполнители</h2>
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+              <div className="flex items-center mb-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-2xl flex items-center justify-center mr-4">
+                  <span className="text-white text-xl">⭐</span>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Топ исполнители</h2>
+                  <p className="text-gray-600">Рекомендуемые мастера</p>
+                </div>
+              </div>
               
               {topExecutors.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {topExecutors.map((executor) => (
-                    <div key={executor.id} className="border border-secondary-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                          <span className="text-primary-600 font-semibold text-sm">
-                            {executor.name.charAt(0).toUpperCase()}
-                          </span>
+                    <div key={executor.id} className="group relative">
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-500 to-secondary-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-1000 group-hover:duration-200"></div>
+                      <div className="relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100/50 hover:border-secondary-200/50 transition-all duration-300 group-hover:scale-105">
+                        <div className="flex items-center space-x-4 mb-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-2xl flex items-center justify-center">
+                            <span className="text-white font-bold text-lg">
+                              {executor.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-900">{executor.name}</h3>
+                            <p className="text-sm text-gray-600 flex items-center">
+                              <MapPin className="h-4 w-4 mr-1 text-primary-500" />
+                              {executor.location}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <h3 className="font-medium text-gray-900">{executor.name}</h3>
-                          <p className="text-sm text-gray-600">{executor.location}</p>
-                        </div>
-                      </div>
                       
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center">
-                          <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                          <Star className="h-4 w-4 text-primary-400 mr-1" />
                           <span className="font-medium">
                             {executor.executorProfile?.rating ? 
                               Number(executor.executorProfile.rating).toFixed(1) : 
@@ -427,10 +490,11 @@ export default function ClientDashboard() {
                         </span>
                       </div>
                       
-                      <div className="mt-3 pt-3 border-t border-secondary-100">
-                        <p className="text-xs text-gray-500">
-                          Выполнено заказов: {executor.executorProfile?.completedOrders || 0}
-                        </p>
+                        <div className="mt-3 pt-3 border-t border-gray-100">
+                          <p className="text-xs text-gray-500">
+                            Выполнено заказов: {executor.executorProfile?.completedOrders || 0}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ))}

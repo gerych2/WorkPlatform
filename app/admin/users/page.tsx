@@ -170,18 +170,18 @@ export default function UserManagement() {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'admin': return 'text-red-600 bg-red-100'
-      case 'executor': return 'text-blue-600 bg-blue-100'
-      case 'client': return 'text-green-600 bg-green-100'
+      case 'executor': return 'text-primary-600 bg-primary-100'
+      case 'client': return 'text-secondary-600 bg-secondary-100'
       default: return 'text-gray-600 bg-gray-100'
     }
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'text-green-600 bg-green-100'
+      case 'active': return 'text-secondary-600 bg-secondary-100'
       case 'inactive': return 'text-gray-600 bg-gray-100'
       case 'banned': return 'text-red-600 bg-red-100'
-      case 'pending': return 'text-yellow-600 bg-yellow-100'
+      case 'pending': return 'text-secondary-600 bg-secondary-100'
       default: return 'text-gray-600 bg-gray-100'
     }
   }
@@ -224,8 +224,8 @@ export default function UserManagement() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-green-100">
-                <User className="h-6 w-6 text-green-600" />
+              <div className="p-2 rounded-lg bg-secondary-100">
+                <User className="h-6 w-6 text-secondary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Клиенты</p>
@@ -238,8 +238,8 @@ export default function UserManagement() {
           
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-blue-100">
-                <Crown className="h-6 w-6 text-blue-600" />
+              <div className="p-2 rounded-lg bg-primary-100">
+                <Crown className="h-6 w-6 text-primary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Исполнители</p>
@@ -266,8 +266,8 @@ export default function UserManagement() {
           
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-yellow-100">
-                <CheckCircle className="h-6 w-6 text-yellow-600" />
+              <div className="p-2 rounded-lg bg-secondary-100">
+                <CheckCircle className="h-6 w-6 text-secondary-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Верифицированные</p>
@@ -511,7 +511,7 @@ export default function UserManagement() {
                               {user.name || 'Без имени'}
                             </div>
                             {user.isVerified === true && (
-                              <CheckCircle className="h-4 w-4 text-green-500 ml-1" />
+                              <CheckCircle className="h-4 w-4 text-secondary-500 ml-1" />
                             )}
                           </div>
                           <div className="text-sm text-gray-500">
@@ -557,7 +557,7 @@ export default function UserManagement() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {user.rating && user.rating > 0 ? (
                         <div className="flex items-center">
-                          <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                          <Star className="h-4 w-4 text-secondary-500 mr-1" />
                           {user.rating.toFixed(1)}
                         </div>
                       ) : (

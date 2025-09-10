@@ -22,7 +22,6 @@ async function createAdmin() {
         location: 'Минск',
         isVerified: true,
         verificationStatus: 'verified',
-        legalStatus: 'individual',
         clientRating: 0,
         clientReviewsCount: 0
       }
@@ -45,5 +44,7 @@ async function createAdmin() {
 }
 
 createAdmin()
+
+
 
 

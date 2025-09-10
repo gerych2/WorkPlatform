@@ -21,7 +21,8 @@ import {
   LogOut,
   Trophy,
   Mail,
-  MessageSquare
+  MessageSquare,
+  Rocket
 } from 'lucide-react'
 import { GamificationDashboard } from '../../components/gamification/GamificationDashboard'
 import { AchievementManager } from '../../components/admin/AchievementManager'
@@ -192,6 +193,20 @@ export default function AdminDashboard() {
       color: 'green'
     },
     {
+      title: 'Управление стартапами',
+      description: 'Создание и управление стартапами',
+      icon: Rocket,
+      href: '/admin/startups',
+      color: 'orange'
+    },
+    {
+      title: 'Заявки на стартапы',
+      description: 'Рассмотрение заявок пользователей',
+      icon: Users,
+      href: '/admin/startup-applications',
+      color: 'blue'
+    },
+    {
       title: 'Служба поддержки',
       description: 'Управление обращениями пользователей',
       icon: MessageSquare,
@@ -212,7 +227,7 @@ export default function AdminDashboard() {
       <AdminGuard>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+            <Loader2 className="h-8 w-8 animate-spin text-primary-600 mx-auto mb-4" />
             <p className="text-gray-600">Загрузка данных...</p>
           </div>
         </div>
@@ -261,7 +276,7 @@ export default function AdminDashboard() {
                     <div className="ml-4">
                       <p className="text-sm font-medium text-gray-600">{stat.title}</p>
                       <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
-                      <p className="text-xs text-green-600">{stat.change}</p>
+                      <p className="text-xs text-secondary-600">{stat.change}</p>
                     </div>
                   </div>
                 </div>

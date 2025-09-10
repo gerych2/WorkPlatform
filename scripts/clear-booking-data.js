@@ -17,3 +17,5 @@ console.log('Теперь перезагрузите страницу (F5)')
 window.location.reload()
 
 
+
+

@@ -32,7 +32,6 @@ export async function GET(request: Request) {
         status: true,
         location: true,
         isVerified: true,
-        legalStatus: true,
         registrationDate: true,
         lastLogin: true,
         executorProfile: {

@@ -127,9 +127,9 @@ export default function AdminSupportPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'open': return <AlertCircle className="h-4 w-4 text-orange-500" />
-      case 'in_progress': return <Clock className="h-4 w-4 text-blue-500" />
-      case 'resolved': return <CheckCircle className="h-4 w-4 text-green-500" />
+      case 'open': return <AlertCircle className="h-4 w-4 text-secondary-500" />
+      case 'in_progress': return <Clock className="h-4 w-4 text-primary-500" />
+      case 'resolved': return <CheckCircle className="h-4 w-4 text-secondary-500" />
       case 'closed': return <CheckCircle className="h-4 w-4 text-gray-500" />
       default: return <AlertCircle className="h-4 w-4 text-gray-500" />
     }
@@ -147,9 +147,9 @@ export default function AdminSupportPage() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'low': return 'text-green-600 bg-green-100'
-      case 'medium': return 'text-yellow-600 bg-yellow-100'
-      case 'high': return 'text-orange-600 bg-orange-100'
+      case 'low': return 'text-secondary-600 bg-secondary-100'
+      case 'medium': return 'text-secondary-600 bg-secondary-100'
+      case 'high': return 'text-secondary-600 bg-secondary-100'
       case 'urgent': return 'text-red-600 bg-red-100'
       default: return 'text-gray-600 bg-gray-100'
     }
@@ -180,7 +180,7 @@ export default function AdminSupportPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Загрузка обращений...</p>
         </div>
       </div>
@@ -193,7 +193,7 @@ export default function AdminSupportPage() {
         {/* Заголовок */}
         <div className="mb-8">
           <div className="flex items-center">
-            <MessageSquare className="h-8 w-8 text-blue-600 mr-3" />
+            <MessageSquare className="h-8 w-8 text-primary-600 mr-3" />
             <h1 className="text-3xl font-bold text-gray-900">Управление поддержкой</h1>
           </div>
           <p className="mt-2 text-gray-600">
@@ -215,7 +215,7 @@ export default function AdminSupportPage() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Поиск по теме, имени или email..."
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
             </div>
@@ -227,7 +227,7 @@ export default function AdminSupportPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="all">Все статусы</option>
                 <option value="open">Открыт</option>
@@ -244,7 +244,7 @@ export default function AdminSupportPage() {
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="all">Все приоритеты</option>
                 <option value="low">Низкий</option>
@@ -289,7 +289,7 @@ export default function AdminSupportPage() {
                         key={ticket.id}
                         onClick={() => setSelectedTicket(ticket)}
                         className={`p-4 cursor-pointer hover:bg-gray-50 ${
-                          selectedTicket?.id === ticket.id ? 'bg-blue-50 border-r-2 border-blue-500' : ''
+                          selectedTicket?.id === ticket.id ? 'bg-primary-50 border-r-2 border-primary-500' : ''
                         }`}
                       >
                         <div className="flex items-start justify-between">
@@ -367,7 +367,7 @@ export default function AdminSupportPage() {
                           key={message.id}
                           className={`p-3 rounded-lg ${
                             message.isFromAdmin
-                              ? 'bg-blue-50 ml-8'
+                              ? 'bg-primary-50 ml-8'
                               : 'bg-gray-50 mr-8'
                           }`}
                         >
@@ -395,7 +395,7 @@ export default function AdminSupportPage() {
                           onChange={(e) => setNewMessage(e.target.value)}
                           placeholder="Напишите ответ пользователю..."
                           rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                         />
                         <div className="flex items-center space-x-3">
                           <Button
@@ -451,3 +451,5 @@ export default function AdminSupportPage() {
     </div>
   )
 }
+
+

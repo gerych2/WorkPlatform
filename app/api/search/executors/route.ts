@@ -106,7 +106,6 @@ export async function GET(request: Request) {
         phone: true,
         location: true,
         isVerified: true,
-        legalStatus: true,
         registrationDate: true,
         lastLogin: true,
         executorProfile: {

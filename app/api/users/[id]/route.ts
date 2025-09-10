@@ -59,7 +59,7 @@ export async function PATCH(
   try {
     const userId = parseInt(params.id)
     const body = await request.json()
-    const { name, email, phone, location, legalStatus } = body
+    const { name, email, phone, location } = body
 
     // Получаем текущего пользователя
     const authHeader = request.headers.get('authorization')
@@ -81,7 +81,6 @@ export async function PATCH(
         ...(email && { email }),
         ...(phone && { phone }),
         ...(location && { location }),
-        ...(legalStatus && { legalStatus })
       },
       include: {
         executorProfile: {
